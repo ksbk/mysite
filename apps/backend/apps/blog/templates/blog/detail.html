@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}
+  {{ post.title }} - MySite
+{% endblock title %}
+{% block content %}
+  <article class="container">
+    <h1 class="mb-4">{{ post.title }}</h1>
+    {% if post.published_at %}
+      <p>
+        <small>Published {{ post.published_at|date:"M d, Y" }}</small>
+      </p>
+    {% endif %}
+    {% if post.summary %}<p class="mt-2">{{ post.summary }}</p>{% endif %}
+    <div class="mt-2">{{ post.body|linebreaks }}</div>
+    <p class="mt-2">
+      <a href="{% url 'blog:list' %}">← Back to Blog</a>
+    </p>
+  </article>
+{% endblock content %}
