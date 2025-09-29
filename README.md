@@ -13,12 +13,14 @@ A Django + Vite web application with a modern full-stack architecture.
 ### Setup
 
 1. **Clone the repository**
+
    ```bash
    git clone <your-repo-url>
    cd mysite
    ```
 
 2. **Set up Python environment**
+
    ```bash
    python -m venv .venv
    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
@@ -26,12 +28,14 @@ A Django + Vite web application with a modern full-stack architecture.
    ```
 
 3. **Set up environment variables**
+
    ```bash
    cp .env.example .env
    # Edit .env with your specific values
    ```
 
 4. **Set up the database**
+
    ```bash
    cd apps/backend
    python manage.py migrate
@@ -39,6 +43,7 @@ A Django + Vite web application with a modern full-stack architecture.
    ```
 
 5. **Set up frontend dependencies**
+
    ```bash
    cd apps/frontend
    npm install
@@ -50,7 +55,30 @@ A Django + Vite web application with a modern full-stack architecture.
 
 You have two options:
 
+### Option C: Using Docker Compose
+
+If you prefer containers, a dev compose is included to run both Django and Vite together.
+
+```bash
+# Copy environment file (adjust as needed)
+cp .env.example .env
+
+# Start the stack
+docker compose -f docker-compose.dev.yml up --build
+
+# Stop (Ctrl+C), then optionally clean up
+docker compose -f docker-compose.dev.yml down
+```
+
+Services:
+
+- Backend (Django): <http://localhost:8000>
+- Frontend (Vite): <http://localhost:5173>
+
+Optional: enable Postgres by uncommenting the service in `docker-compose.dev.yml` and set `DATABASE_URL` in `.env`.
+
 ### Option A: Using Makefile (Recommended)
+
 ```bash
 # Start both frontend (Vite) and backend (Django) together
 make dev
@@ -63,6 +91,7 @@ HOST=0.0.0.0 PORT=9000 make run
 ```
 
 ### Option B: Manual
+
 ```bash
 # Terminal 1: Start frontend dev server
 cd apps/frontend
@@ -88,7 +117,7 @@ make build        # Build frontend and collect static files
 
 ## 📁 Project Structure
 
-```
+```text
 mysite/
 ├── apps/
 │   ├── backend/           # Django application
@@ -153,23 +182,27 @@ python manage.py test -v 2
 ### Production Setup
 
 1. **Environment variables**
+
    - Set `DEBUG=False`
    - Configure proper `SECRET_KEY`
    - Set `ALLOWED_HOSTS` to your domain
    - Configure production database
 
 2. **Build frontend**
+
    ```bash
    make build
    ```
 
 3. **Collect static files**
+
    ```bash
    cd apps/backend
    python manage.py collectstatic --noinput
    ```
 
 4. **Run migrations**
+
    ```bash
    python manage.py migrate
    ```
@@ -184,12 +217,14 @@ python manage.py test -v 2
 ### Adding New Django Apps
 
 1. Create the app:
+
    ```bash
    cd apps/backend
    python manage.py startapp myapp apps/myapp
    ```
 
 2. Add to `INSTALLED_APPS` in `base.py`:
+
    ```python
    INSTALLED_APPS = [
        # ...
@@ -198,6 +233,7 @@ python manage.py test -v 2
    ```
 
 3. Update the app's `AppConfig` name to match the full path:
+
    ```python
    # apps/myapp/apps.py
    class MyAppConfig(AppConfig):
@@ -213,8 +249,8 @@ python manage.py test -v 2
 ### Configure dev server address (HOST/PORT)
 
 - The Makefile defines a single source of truth for the backend address:
-   - `HOST ?= 127.0.0.1`
-   - `PORT ?= 8001`
+  - `HOST ?= 127.0.0.1`
+  - `PORT ?= 8001`
 - VS Code launch/tasks also use `HOST`/`PORT` with the same defaults.
 - You can override without editing files:
 

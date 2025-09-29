@@ -196,6 +196,7 @@ repos:
         files: |
           (?x)^
           (
+            README\.md|
             docs/.*\.(md|markdown)$
           )
 
