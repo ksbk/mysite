@@ -5,17 +5,19 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="color-scheme" content="light dark" />
+        <meta name="referrer" content="strict-origin-when-cross-origin" />
         <meta name="description"
-              content="{% block meta_description %}MySite - A modern Django + Vite application{% endblock %}" />
+              content="{% block meta_description %}{{ SITE.meta_description }}{% endblock %}" />
         <meta name="keywords"
-              content="{% block meta_keywords %}django,vite,web development{% endblock %}" />
+              content="{% block meta_keywords %}{{ SITE.meta_keywords }}{% endblock %}" />
         <meta name="author" content="{% block meta_author %}MySite{% endblock %}" />
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website" />
         <meta property="og:url"
               content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}" />
         <meta property="og:title"
-              content="{% block og_title %}MySite{% endblock %}" />
+              content="{% block og_title %}{{ SITE.site_name }}{% endblock %}" />
         <meta property="og:description"
               content="{% block og_description %}MySite - A modern Django + Vite application{% endblock %}" />
         <!-- Twitter -->
@@ -23,25 +25,24 @@
         <meta property="twitter:url"
               content="{% block twitter_url %}{{ request.build_absolute_uri }}{% endblock %}" />
         <meta property="twitter:title"
-              content="{% block twitter_title %}MySite{% endblock %}" />
+              content="{% block twitter_title %}{{ SITE.site_name }}{% endblock %}" />
         <meta property="twitter:description"
               content="{% block twitter_description %}MySite - A modern Django + Vite application{% endblock %}" />
         <title>
-            {% block title %}MySite{% endblock %}
+            {% block title %}{{ SITE.site_name }}{% endblock %}
         </title>
         <!-- Favicon -->
         <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}" />
         <link rel="alternate icon" href="{% static 'favicon.ico' %}" />
         {% block preconnect %}
-            {% if DEBUG %}<link rel="preconnect" href="http://localhost:5173" />{% endif %}
+            {% if VITE_DEV and VITE_DEV_AVAILABLE %}<link rel="preconnect" href="{{ VITE_DEV_SERVER_URL }}" />{% endif %}
         {% endblock %}
         {% block head_extra %}{% endblock %}
-        {# Vite assets:
-dev = HMR, prod = manifest #}
-        {% if DEBUG %}
+        {# Vite assets: dev = HMR when dev server is available; prod uses manifest #}
+        {% if VITE_DEV and VITE_DEV_AVAILABLE %}
             {% vite_hmr %}
         {% else %}
-            {% vite_asset %}
+            {% vite_asset 'src/main.ts' %}
         {% endif %}
         {% block css %}{% endblock %}
         {% block extra_css %}{% endblock %}
@@ -49,9 +50,7 @@ dev = HMR, prod = manifest #}
     <body class="{% block body_class %}bg-white text-slate-900 antialiased{% endblock %}">
         <!-- Skip to Main Content for Keyboard Users -->
         <a href="#main-content"
-           class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50 transition-all duration-200">
-            Skip to main content
-        </a>
+           class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50 transition-all duration-200">Skip to main content</a>
         <!-- Header -->
         {% block header %}
             {% include "components/header.html" %}
@@ -71,10 +70,7 @@ dev = HMR, prod = manifest #}
                             <!-- Default content fallback -->
                             <div class="text-center py-12">
                                 <h1 class="text-4xl font-bold text-gray-900 mb-4">Welcome to MySite</h1>
-                                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-                                    A modern Django + Vite application built with best
-                                    practices.
-                                </p>
+                                <p class="text-xl text-gray-600 max-w-2xl mx-auto">A modern Django + Vite application built with best practices.</p>
                             </div>
                         {% endblock %}
                     </div>
@@ -86,12 +82,18 @@ dev = HMR, prod = manifest #}
             {% include "components/footer.html" %}
         {% endblock %}
         <!-- JavaScript Assets -->
+        <!-- JavaScript Assets -->
         {% block js %}{% endblock %}
         {% block extra_js %}{% endblock %}
         <!-- Analytics and Tracking -->
         {% block analytics %}
             {% if not DEBUG %}<!-- Production analytics scripts go here -->{% endif %}
         {% endblock %}
+        <noscript>
+            <div class="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-md shadow-lg z-40">
+                This site works best with JavaScript enabled.
+            </div>
+        </noscript>
         <!-- Development Banner -->
         {% if DEBUG %}
             <div class="fixed bottom-4 right-4 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded-md shadow-lg z-40">
