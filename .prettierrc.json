@@ -1,10 +1,5 @@
 {
     "printWidth": 88,
-    "singleQuote": false,
-    "trailingComma": "es5",
-    "semi": true,
-    "arrowParens": "always",
-    "endOfLine": "lf",
     "bracketSameLine": true,
     "singleAttributePerLine": false,
     "htmlWhitespaceSensitivity": "ignore"
