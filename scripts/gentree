@@ -1,0 +1,80 @@
+#!/bin/bash
+#
+# Repository Tree Generator
+# A convenient wrapper around the tree.py script
+#
+
+# Colors for pretty output
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Get script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+TREE_SCRIPT="$SCRIPT_DIR/tree.py"
+
+echo -e "${GREEN}🌳 Repository Tree Generator${NC}"
+echo -e "${BLUE}Project: $(basename "$PROJECT_ROOT")${NC}"
+echo ""
+
+# Default options
+DEPTH=""
+OUTPUT=""
+SIMPLE=""
+EXTRAS=""
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -d|--depth)
+            DEPTH="-d $2"
+            shift 2
+            ;;
+        -o|--output)
+            OUTPUT="-o $2"
+            shift 2
+            ;;
+        -s|--simple)
+            SIMPLE="--simple"
+            shift
+            ;;
+        -h|--help)
+            python "$TREE_SCRIPT" --help
+            exit 0
+            ;;
+        --docs)
+            echo -e "${YELLOW}Generating documentation tree...${NC}"
+            OUTPUT="-o TREE.md"
+            SIMPLE="--simple"
+            DEPTH="-d 3"
+            shift
+            ;;
+        --full)
+            echo -e "${YELLOW}Generating full project tree...${NC}"
+            shift
+            ;;
+        *)
+            EXTRAS="$EXTRAS $1"
+            shift
+            ;;
+    esac
+done
+
+# Build command
+CMD="python \"$TREE_SCRIPT\" $SIMPLE $DEPTH $OUTPUT $EXTRAS"
+
+# Execute
+cd "$PROJECT_ROOT"
+eval $CMD
+
+# Show helpful message
+if [[ -n "$OUTPUT" ]]; then
+    OUTPUT_FILE=$(echo $OUTPUT | sed 's/-o //')
+    echo ""
+    echo -e "${GREEN}✅ Tree saved to: $OUTPUT_FILE${NC}"
+else
+    echo ""
+    echo -e "${BLUE}💡 Tip: Use --docs for documentation, --simple for clean output${NC}"
+fi

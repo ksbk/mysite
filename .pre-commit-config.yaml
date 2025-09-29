@@ -1,0 +1,222 @@
+# .pre-commit-config.yaml
+# Professional preset for Django + Vite repos:
+# - Python: Ruff (lint+format), MyPy (types), django-upgrade (safe modernizations)
+# - Templates: djLint
+# - Frontend: Prettier
+# - Hygiene: core checks
+# - Security: detect-secrets (baseline)
+# Versions pinned for reproducible CI. Revisit quarterly.
+
+default_install_hook_types: [pre-commit, commit-msg]
+
+ci:
+  autofix_prs: true
+  autoupdate_schedule: quarterly
+
+repos:
+  # --- Hygiene -------------------------------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=800"]
+        exclude: |
+          (?x)^
+          (
+            apps/frontend/dist/|
+            apps/frontend/public/|
+            apps/frontend/node_modules/|
+            apps/static/|
+            apps/staticfiles/|
+            static/|
+            staticfiles/
+          )
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+        exclude: |
+          (?x)^
+          (
+            apps/frontend/dist/|
+            apps/frontend/node_modules/|
+            apps/static/|
+            apps/staticfiles/|
+            static/|
+            staticfiles/|
+            .*\.min\.(js|css)$
+          )
+      - id: trailing-whitespace
+        args: ["--markdown-linebreak-ext=md"]
+        exclude: |
+          (?x)^
+          (
+            apps/frontend/dist/|
+            apps/frontend/node_modules/|
+            apps/static/|
+            apps/staticfiles/|
+            static/|
+            staticfiles/|
+            .*\.min\.(js|css)$
+          )
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+        exclude: |
+          (?x)^
+          (
+            apps/frontend/dist/|
+            apps/frontend/node_modules/|
+            apps/static/|
+            apps/staticfiles/|
+            static/|
+            staticfiles/|
+            .*\.min\.(js|css)$
+          )
+      - id: check-yaml
+      - id: check-json
+        exclude: |
+          (?x)^
+          (
+            apps/frontend/tsconfig\.json
+          )
+      - id: check-toml
+
+  # --- Secrets -------------------------------------------------
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ["--baseline", ".secrets.baseline"]
+        exclude: |
+          (?x)^
+          (
+            apps/frontend/dist/|
+            apps/frontend/node_modules/|
+            apps/static/|
+            apps/staticfiles/|
+            static/|
+            staticfiles/|
+            package-lock\.json
+          )
+
+  # --- Python: Ruff (lint + format) ---------------------------
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.8
+    hooks:
+      - id: ruff
+        name: ruff (lint+fix)
+        args: ["--fix", "--show-fixes"]
+        types_or: [python]
+        exclude: |
+          (?x)^
+          (
+            apps/frontend/|
+            .*/migrations/.*
+          )
+      - id: ruff-format
+        name: ruff (format)
+        types_or: [python]
+        exclude: |
+          (?x)^
+          (
+            apps/frontend/|
+            .*/migrations/.*
+          )
+
+  # --- Python: MyPy (types) -----------------------------------
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0
+    hooks:
+      - id: mypy
+        name: mypy (django)
+        args: ["--config-file=pyproject.toml"]
+        additional_dependencies:
+          - django-stubs==5.0.2
+          - django-stubs-ext==5.0.2
+          - types-requests
+        exclude: |
+          (?x)^
+          (
+            .*/migrations/.*|
+            apps/frontend/|
+            static/|
+            .*tests?/.*  # keep tests looser; enforce in CI if desired
+          )
+
+  # --- Django modernizer --------------------------------------
+  - repo: https://github.com/adamchainz/django-upgrade
+    rev: 1.18.0
+    hooks:
+      - id: django-upgrade
+        args: ["--target-version", "5.0"]
+        exclude: "(?x)^(.*/migrations/.*)$"
+
+  # --- Django templates: djLint -------------------------------
+  - repo: https://github.com/djlint/djLint
+    rev: v1.36.4
+    hooks:
+      - id: djlint
+        name: djlint (reformat)
+        args: ["--reformat", "--profile=django"]
+        files: "(templates/.*\\.html$|.*templates/.+\\.html$)"
+        additional_dependencies: [djlint==1.36.4]
+        exclude: |
+          (?x)^
+          (
+            apps/frontend/|
+            static/
+          )
+
+  # --- Frontend: Prettier (Node local hook) -------------------
+  - repo: local
+    hooks:
+      - id: prettier-frontend
+        name: prettier (frontend)
+        language: node
+        entry: prettier
+        additional_dependencies: ["prettier@3.6.2"]
+        files: |
+          (?x)^
+          (
+            apps/frontend/.*\.(js|jsx|ts|tsx|json|css|scss|md|yaml|yml)$
+          )
+        exclude: |
+          (?x)^
+          (
+            apps/frontend/dist/|
+            apps/frontend/node_modules/|
+            .*\.min\.(js|css)$
+          )
+        args: ["--write"]
+
+  # --- Markdown style -----------------------------------------
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.14.0
+    hooks:
+      - id: markdownlint-cli2
+        name: markdownlint
+        files: |
+          (?x)^
+          (
+            docs/.*\.(md|markdown)$
+          )
+
+  # --- Shell scripts ------------------------------------------
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+        files: "(^|/)(scripts/|\\.devcontainer/).*\\.(sh|bash)$"
+
+  # --- Dockerfiles --------------------------------------------
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint
+        files: "(^|/)Dockerfile(\\..*)?$|\\.dockerfile$"
+        args: ["--failure-threshold", "warning"]
+
+  # --- Conventional commits (commit-msg) ----------------------
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.1.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]

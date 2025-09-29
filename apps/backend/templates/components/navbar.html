@@ -1,0 +1,12 @@
+<div class="flex items-center gap-6 text-slate-700">
+  {% block nav_links %}
+    <a class="hover:text-blue-600 transition-colors"
+       href="{% url 'pages:home' %}">Home</a>
+    <a class="hover:text-blue-600 transition-colors"
+       href="{% url 'projects:list' %}">Projects</a>
+    <a class="hover:text-blue-600 transition-colors"
+       href="{% url 'blog:list' %}">Blog</a>
+    <a class="hover:text-blue-600 transition-colors"
+       href="{% url 'contact:form' %}">Contact</a>
+  {% endblock %}
+</div>

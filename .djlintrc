@@ -1,0 +1,9 @@
+profile: django
+indent: 2
+max_line_length: 120
+format_css: true
+format_js: true
+use_gitignore: true
+
+# You can ignore specific rules if needed, e.g.:
+# ignore: "H023,H030"
