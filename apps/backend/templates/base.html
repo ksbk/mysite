@@ -40,7 +40,7 @@
         {% if DEBUG %}
             {% vite_hmr %}
         {% else %}
-            {% vite_assets VITE_MANIFEST_PATH %}
+            {% vite_asset %}
         {% endif %}
         {% block css %}{% endblock %}
         {% block extra_css %}{% endblock %}
