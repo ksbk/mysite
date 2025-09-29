@@ -30,8 +30,10 @@ setup: install migrate
 install:
 	@echo "📦 Creating virtual environment (.venv) with uv..."
 	uv venv .venv
-	@echo "📦 Installing Python dependencies into .venv (uv)..."
-	uv pip install --python .venv/bin/python -e .[dev]
+	@echo "📦 Installing Python dependencies into .venv (uv) from requirements.txt..."
+	uv pip install --python .venv/bin/python -r requirements.txt
+	@echo "📦 Installing Python dev dependencies into .venv (uv) from requirements-dev.txt..."
+	uv pip install --python .venv/bin/python -r requirements-dev.txt || true
 	@echo "📦 Installing Node.js dependencies..."
 	npm install --prefix apps/frontend
 	@echo "✅ Dependencies installed!"

@@ -2,79 +2,99 @@
 {% load core_vite %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description"
-          content="{% block meta_description %}MySite - A modern Django + Vite application{% endblock %}" />
-    <meta name="keywords"
-          content="{% block meta_keywords %}django, vite, web development{% endblock %}" />
-    <meta name="author" content="{% block meta_author %}MySite{% endblock %}" />
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url"
-          content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}" />
-    <meta property="og:title"
-          content="{% block og_title %}MySite{% endblock %}" />
-    <meta property="og:description"
-          content="{% block og_description %}MySite - A modern Django + Vite application{% endblock %}" />
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url"
-          content="{% block twitter_url %}{{ request.build_absolute_uri }}{% endblock %}" />
-    <meta property="twitter:title"
-          content="{% block twitter_title %}MySite{% endblock %}" />
-    <meta property="twitter:description"
-          content="{% block twitter_description %}MySite - A modern Django + Vite application{% endblock %}" />
-    <title>
-      {% block title %}MySite{% endblock %}
-    </title>
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}" />
-    <link rel="alternate icon" href="{% static 'favicon.ico' %}" />
-    <!-- Preconnect to external domains for performance -->
-    {% block preconnect %}{% endblock %}
-    {% block head_extra %}
-    {% endblock
-    %}
-    {# Vite assets: dev uses HMR client, prod uses manifest via
-vite_asset #} {% vite_hmr %} {% vite_asset 'src/main.ts' %}
-    {% block css
-      %}
-    {% endblock %}
-    {% block extra_css %}{% endblock %}
-  </head>
-  <body class="{% block body_class %}bg-white text-slate-900 antialiased{% endblock %}">
-    {% block header %}
-      {% include "components/header.html" %}
-    {% endblock
-    header %}
-    {% block messages %}
-      {% include "components/messages.html" %}
-    {% endblock messages %}
-    {% block breadcrumbs %}
-      {% include
-      "components/breadcrumbs.html" %}
-    {% endblock breadcrumbs %}
-    <main>
-      <div class="max-w-6xl mx-auto px-4 py-8">
-        <div class="prose">
-          {% block content %}{% endblock %}
-        </div>
-      </div>
-    </main>
-    {% block footer %}
-      {% include "components/footer.html" %}
-    {% endblock
-    footer %}
-    {% block js %}
-    {% endblock js %}
-    {% block extra_js %}
-      {%
-      endblock extra_js %}
-      <!-- Analytics and other scripts -->
-      {% block analytics %}{% endblock %}
-      {# Optional dev banner removed to
-        keep base.html a thin skeleton #}
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description"
+              content="{% block meta_description %}MySite - A modern Django + Vite application{% endblock %}" />
+        <meta name="keywords"
+              content="{% block meta_keywords %}django,vite,web development{% endblock %}" />
+        <meta name="author" content="{% block meta_author %}MySite{% endblock %}" />
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website" />
+        <meta property="og:url"
+              content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}" />
+        <meta property="og:title"
+              content="{% block og_title %}MySite{% endblock %}" />
+        <meta property="og:description"
+              content="{% block og_description %}MySite - A modern Django + Vite application{% endblock %}" />
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url"
+              content="{% block twitter_url %}{{ request.build_absolute_uri }}{% endblock %}" />
+        <meta property="twitter:title"
+              content="{% block twitter_title %}MySite{% endblock %}" />
+        <meta property="twitter:description"
+              content="{% block twitter_description %}MySite - A modern Django + Vite application{% endblock %}" />
+        <title>
+            {% block title %}MySite{% endblock %}
+        </title>
+        <!-- Favicon -->
+        <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}" />
+        <link rel="alternate icon" href="{% static 'favicon.ico' %}" />
+        {% block preconnect %}
+            {% if DEBUG %}<link rel="preconnect" href="http://localhost:5173" />{% endif %}
+        {% endblock %}
+        {% block head_extra %}{% endblock %}
+        {# Vite assets: dev = HMR, prod = manifest #}
+        {% if DEBUG %}
+            {% vite_hmr %}
+        {% else %}
+            {% vite_assets VITE_MANIFEST_PATH %}
+        {% endif %}
+        {% block css %}{% endblock %}
+        {% block extra_css %}{% endblock %}
+    </head>
+    <body class="{% block body_class %}bg-white text-slate-900 antialiased{% endblock %}">
+        <!-- Skip to Main Content for Keyboard Users -->
+        <a href="#main-content"
+           class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50 transition-all duration-200">
+            Skip to main content
+        </a>
+        <!-- Header -->
+        {% block header %}
+            {% include "components/header.html" %}
+        {% endblock %}
+        {% block messages %}
+            {% include "components/messages.html" %}
+        {% endblock %}
+        {% block breadcrumbs %}
+            {% include "components/breadcrumbs.html" %}
+        {% endblock %}
+        <!-- Main Content Area -->
+        {% block main %}
+            <main id="main-content" role="main" class="flex-1">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <div class="prose prose-lg max-w-none">
+                        {% block content %}
+                            <!-- Default content fallback -->
+                            <div class="text-center py-12">
+                                <h1 class="text-4xl font-bold text-gray-900 mb-4">Welcome to MySite</h1>
+                                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                                    A modern Django + Vite application built with best practices.
+                                </p>
+                            </div>
+                        {% endblock %}
+                    </div>
+                </div>
+            </main>
+        {% endblock %}
+        <!-- Footer -->
+        {% block footer %}
+            {% include "components/footer.html" %}
+        {% endblock %}
+        {% block js %}{% endblock %}
+        {% block extra_js %}{% endblock %}
+        <!-- Analytics and Tracking -->
+        {% block analytics %}
+            {% if not DEBUG %}<!-- Production analytics scripts go here -->{% endif %}
+        {% endblock %}
+        <!-- Development Banner -->
+        {% if DEBUG %}
+            <div class="fixed bottom-4 right-4 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded-md shadow-lg z-40">
+                <strong>Development Mode</strong>
+                <p class="text-sm">This site is running in debug mode.</p>
+            </div>
+        {% endif %}
     </body>
-  </html>
+</html>

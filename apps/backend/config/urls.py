@@ -23,11 +23,11 @@ from django.contrib import admin
 from django.urls import URLPattern, URLResolver, include, path
 
 urlpatterns: list[URLResolver | URLPattern] = [
+    path("", include("apps.pages.urls", namespace="pages")),
+    path("blog/", include("apps.blog.urls", namespace="blog")),
+    path("contact/", include("apps.contact.urls", namespace="contact")),
+    path("projects/", include("apps.projects.urls", namespace="projects")),
     path("admin/", admin.site.urls),
-    path("", include("apps.pages.urls")),
-    path("blog/", include("apps.blog.urls")),
-    path("contact/", include("apps.contact.urls")),
-    path("projects/", include("apps.projects.urls")),
 ]
 
 # Serve static and media files in development

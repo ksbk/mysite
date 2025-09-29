@@ -1,13 +1,11 @@
 {% extends "base.html" %}
-{% block title %}
-  Message Sent - MySite
-{% endblock title %}
+{% block title %}Message Sent - MySite{% endblock %}
 {% block content %}
-  <section class="container">
-    <h1 class="mb-4">Thank you!</h1>
-    <p>Your message has been sent. We'll get back to you soon.</p>
-    <p class="mt-2">
-      <a href="{% url 'pages:home' %}">← Back to Home</a>
-    </p>
-  </section>
-{% endblock content %}
+    <section class="container">
+        <h1 class="mb-4">Thank you!</h1>
+        <p>Your message has been sent. We'll get back to you soon.</p>
+        <p class="mt-2">
+            <a href="{% url 'pages:home' %}">← Back to Home</a>
+        </p>
+    </section>
+{% endblock %}
