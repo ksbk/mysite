@@ -70,7 +70,7 @@ preview = true
 [tool.djlint]
 profile = "django"
 indent = 4
-max_line_length = 88
+max_line_length = 140
 preserve_new_lines = false
 ignore = "T003,H022"
 

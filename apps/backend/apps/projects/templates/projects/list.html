@@ -8,12 +8,8 @@
                 {% for project in projects %}
                     <li>
                         <a href="{{ project.get_absolute_url }}">{{ project.name }}</a>
-                        {% if project.url %}
-                            — <a href="{{ project.url }}" target="_blank" rel="noopener">Live</a>
-                        {% endif %}
-                        {% if project.repo_url %}
-                            — <a href="{{ project.repo_url }}" target="_blank" rel="noopener">Source</a>
-                        {% endif %}
+                        {% if project.url %}— <a href="{{ project.url }}" target="_blank" rel="noopener">Live</a>{% endif %}
+                        {% if project.repo_url %}— <a href="{{ project.repo_url }}" target="_blank" rel="noopener">Source</a>{% endif %}
                         {% if project.description %}<p class="mt-2">{{ project.description }}</p>{% endif %}
                     </li>
                 {% endfor %}

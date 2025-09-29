@@ -36,7 +36,8 @@
             {% if DEBUG %}<link rel="preconnect" href="http://localhost:5173" />{% endif %}
         {% endblock %}
         {% block head_extra %}{% endblock %}
-        {# Vite assets: dev = HMR, prod = manifest #}
+        {# Vite assets:
+dev = HMR, prod = manifest #}
         {% if DEBUG %}
             {% vite_hmr %}
         {% else %}
@@ -71,7 +72,8 @@
                             <div class="text-center py-12">
                                 <h1 class="text-4xl font-bold text-gray-900 mb-4">Welcome to MySite</h1>
                                 <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-                                    A modern Django + Vite application built with best practices.
+                                    A modern Django + Vite application built with best
+                                    practices.
                                 </p>
                             </div>
                         {% endblock %}
@@ -83,6 +85,7 @@
         {% block footer %}
             {% include "components/footer.html" %}
         {% endblock %}
+        <!-- JavaScript Assets -->
         {% block js %}{% endblock %}
         {% block extra_js %}{% endblock %}
         <!-- Analytics and Tracking -->
