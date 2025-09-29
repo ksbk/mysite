@@ -187,6 +187,23 @@ repos:
           )
         args: ["--write"]
 
+      - id: eslint-frontend
+        name: eslint (frontend)
+        language: node
+        entry: eslint
+        additional_dependencies:
+          - "eslint@9.13.0"
+          - "@typescript-eslint/parser@8.8.1"
+          - "@typescript-eslint/eslint-plugin@8.8.1"
+          - "eslint-config-prettier@9.1.0"
+        files: |
+          (?x)^
+          (
+            apps/frontend/src/.*\.(ts|tsx)$
+          )
+        pass_filenames: false
+        args: ["--max-warnings=0", "--no-error-on-unmatched-pattern", "-c", "apps/frontend/eslint.config.mjs", "apps/frontend/src"]
+
   # --- Markdown style -----------------------------------------
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.14.0
@@ -221,3 +238,17 @@ repos:
     hooks:
       - id: conventional-pre-commit
         stages: [commit-msg]
+
+  # --- Security scanning -------------------------------------
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.9
+    hooks:
+      - id: bandit
+        args: ["-q", "-r", "apps/backend/apps"]
+        exclude: "(?x)^(.*tests?/.+)$"
+
+  - repo: https://github.com/pypa/pip-audit
+    rev: v2.7.3
+    hooks:
+      - id: pip-audit
+        args: ["-r", "requirements.txt", "-r", "requirements-dev.txt"]

@@ -1,0 +1,16 @@
+# Normalize line endings and mark text files
+* text=auto eol=lf
+
+# Treat lockfiles and generated artifacts
+apps/frontend/dist/** linguist-generated=true
+apps/frontend/public/** linguist-vendored=true
+**/*.min.js linguist-generated=true
+**/*.min.css linguist-generated=true
+
+# Images as binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.svg text eol=lf
