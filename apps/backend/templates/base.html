@@ -5,16 +5,16 @@
 {% load compress %}
 
 <!DOCTYPE html>
-    <html lang="{{ LANGUAGE_CODE|default:'en' }}"
-          dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
-<head>
+<html lang="{{ LANGUAGE_CODE|default:'en' }}"
+      dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
+  <head>
     {# ========================================
        CORE META TAGS & DOCUMENT SETTINGS
        ======================================== #}
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="color-scheme" content="light dark"/>
-    <meta name="referrer" content="strict-origin-when-cross-origin"/>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
 
     {# ========================================
        SEO & SOCIAL MEDIA META TAGS
@@ -26,7 +26,9 @@
     {# ========================================
        PAGE TITLE
        ======================================== #}
-    <title>{% block title %}{{ SITE.site_name|default:'MySite' }}{% endblock %}</title>
+    <title>
+      {% block title %}{{ SITE.site_name|default:'MySite' }}{% endblock %}
+    </title>
 
     {# ========================================
        PWA & PERFORMANCE OPTIMIZATIONS
@@ -37,24 +39,23 @@
     {# ========================================
        CANONICAL URL & SECURITY TOKENS
        ======================================== #}
-    <link rel="canonical" href="{{ SITE.canonical_url|default:request.build_absolute_uri }}"/>
+    <link rel="canonical"
+          href="{{ SITE.canonical_url|default:request.build_absolute_uri }}" />
 
     {% if csrf_token and csrf_token != 'NOTPROVIDED' %}
-        <meta name="csrf-token" content="{{ csrf_token }}"/>
+      <meta name="csrf-token" content="{{ csrf_token }}" />
     {% endif %}
 
-    {% if csp_nonce %}
-        <meta name="csp-nonce" content="{{ csp_nonce }}"/>
-    {% endif %}
+    {% if csp_nonce %}<meta name="csp-nonce" content="{{ csp_nonce }}" />{% endif %}
 
     {# ========================================
        STRUCTURED DATA & SCHEMA MARKUP
        ======================================== #}
     {% block structured_data %}
-        {% include "includes/structured_data.html" %}
-        {% if SITE.json_ld %}
-            {% render_json_ld SITE.json_ld %}
-        {% endif %}
+      {% include "includes/structured_data.html" %}
+      {% if SITE.json_ld %}
+        {% render_json_ld SITE.json_ld %}
+      {% endif %}
     {% endblock %}
 
     {# ========================================
@@ -66,98 +67,98 @@
        CRITICAL CSS & VITE ASSETS
        ======================================== #}
     {% if VITE_DEV and VITE_DEV_AVAILABLE %}
-        {# Development: Vite HMR for hot module replacement #}
-        {% vite_hmr %}
+      {# Development: Vite HMR for hot module replacement #}
+      {% vite_hmr %}
     {% else %}
-        {# Production: Preload critical resources for performance #}
-        {% block critical_css %}
-            <link rel="preload" as="style" href="{% static 'dist/assets/main.css' %}"
-                  onload="this.onload=null;this.rel='stylesheet'"/>
-            <noscript>
-                <link rel="stylesheet" href="{% static 'dist/assets/main.css' %}"/>
-            </noscript>
-        {% endblock %}
-        {% vite_asset 'src/main.ts' %}
+      {# Production: Preload critical resources for performance #}
+      {% block critical_css %}
+        <link rel="preload"
+              as="style"
+              href="{% static 'dist/assets/main.css' %}"
+              onload="this.onload=null;this.rel='stylesheet'" />
+        <noscript>
+          <link rel="stylesheet" href="{% static 'dist/assets/main.css' %}" />
+        </noscript>
+      {% endblock %}
+      {% vite_asset 'src/main.ts' %}
     {% endif %}
 
     {# ========================================
        COMPRESSED & ADDITIONAL CSS
        ======================================== #}
     {% compress css %}
-        {% block css %}{% endblock %}
+      {% block css %}{% endblock %}
     {% endcompress %}
 
     {% block extra_css %}{% endblock %}
-</head>
+  </head>
 
-<body class="bg-white text-slate-900 antialiased {% block body_class %}{% endblock %}">
+  <body class="bg-white text-slate-900 antialiased {% block body_class %}{% endblock %}">
     {# ========================================
        ACCESSIBILITY: SKIP TO MAIN CONTENT
        ======================================== #}
     <a href="#main-content"
        class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50 transition-all duration-200">
-        {% trans "Skip to main content" %}
+      {% trans "Skip to main content" %}
     </a>
 
     {# ========================================
        SITE HEADER & NAVIGATION
        ======================================== #}
     {% block header %}
-        {% include "components/header.html" %}
+      {% include "components/header.html" %}
     {% endblock %}
 
     {# ========================================
        USER MESSAGES & NOTIFICATIONS
        ======================================== #}
     {% block messages %}
-        <div aria-live="polite">
-            {% include "components/messages.html" %}
-        </div>
+      <div aria-live="polite">{% include "components/messages.html" %}</div>
     {% endblock %}
 
     {# ========================================
        BREADCRUMB NAVIGATION
        ======================================== #}
     {% block breadcrumbs %}
-        {% include "components/breadcrumbs.html" %}
+      {% include "components/breadcrumbs.html" %}
     {% endblock %}
 
     {# ========================================
        MAIN CONTENT AREA
        ======================================== #}
     {% block main %}
-        <main id="main-content" class="flex-1" role="main">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {# Apply typography classes for article-like content #}
-                <div class="{% block prose_wrapper_class %}prose prose-lg max-w-none{% endblock %}">
-                    {% block content %}
-                        {# Default hero section - override in child templates #}
-                        <div class="text-center py-12">
-                            <h1 class="text-4xl font-bold text-gray-900 mb-4">
-                                {{ SITE.hero_title|default:"Welcome to MySite" }}
-                            </h1>
-                            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-                                {{ SITE.hero_subtitle|default:"A modern Django + Vite application built with best practices." }}
-                            </p>
-                        </div>
-                    {% endblock %}
-                </div>
-            </div>
-        </main>
+      <main id="main-content" class="flex-1" role="main">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {# Apply typography classes for article-like content #}
+          <div class="{% block prose_wrapper_class %}prose prose-lg max-w-none{% endblock %}">
+            {% block content %}
+              {# Default hero section - override in child templates #}
+              <div class="text-center py-12">
+                <h1 class="text-4xl font-bold text-gray-900 mb-4">
+                  {{ SITE.hero_title|default:"Welcome to MySite" }}
+                </h1>
+                <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                  {{ SITE.hero_subtitle|default:"A modern Django + Vite application built with best practices." }}
+                </p>
+              </div>
+            {% endblock %}
+          </div>
+        </div>
+      </main>
     {% endblock %}
 
     {# ========================================
        SITE FOOTER
        ======================================== #}
     {% block footer %}
-        {% include "components/footer.html" %}
+      {% include "components/footer.html" %}
     {% endblock %}
 
     {# ========================================
        JAVASCRIPT & SCRIPTS
        ======================================== #}
     {% compress js %}
-        {% block js %}{% endblock %}
+      {% block js %}{% endblock %}
     {% endcompress %}
 
     {% block extra_js %}{% endblock %}
@@ -166,69 +167,67 @@
        PWA SERVICE WORKER (Production Only)
        ======================================== #}
     {% block service_worker %}
-        {% if not debug %}
-            <script{% if csp_nonce %} nonce="{{ csp_nonce }}"{% endif %}>
-                // Register service worker for offline functionality
-                if ('serviceWorker' in navigator) {
-                    window.addEventListener('load', function() {
-                        navigator.serviceWorker.register('/sw.js')
-                            .then(function(registration) {
-                                console.log('Service Worker registered:', registration);
-                            })
-                            .catch(function(registrationError) {
-                                console.log('Service Worker registration failed:', registrationError);
-                            });
-                    });
-                }
-            </script>
-        {% endif %}
+      {% if not debug %}
+        <script {% if csp_nonce %}nonce="{{ csp_nonce }}"{% endif %}>
+            // Register service worker for offline functionality
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(function(registration) {
+                            console.log('Service Worker registered:', registration);
+                        })
+                        .catch(function(registrationError) {
+                            console.log('Service Worker registration failed:', registrationError);
+                        });
+                });
+            }
+        </script>
+      {% endif %}
     {% endblock %}
 
     {# ========================================
        ANALYTICS & PERFORMANCE MONITORING
        ======================================== #}
     {% block analytics %}
-        {% if not debug %}
-            {# Performance monitoring script #}
-            <script{% if csp_nonce %} nonce="{{ csp_nonce }}"{% endif %}>
-                // Collect and report performance metrics
-                window.addEventListener('load', function() {
-                    if ('performance' in window) {
-                        const perfData = {
-                            dns: performance.timing.domainLookupEnd - performance.timing.domainLookupStart,
-                            connect: performance.timing.connectEnd - performance.timing.connectStart,
-                            ttfb: performance.timing.responseStart - performance.timing.navigationStart,
-                            load: performance.timing.loadEventEnd - performance.timing.navigationStart
-                        };
-                        // Send to your analytics service
-                        console.log('Performance metrics:', perfData);
-                    }
-                });
-            </script>
+      {% if not debug %}
+        {# Performance monitoring script #}
+        <script {% if csp_nonce %}nonce="{{ csp_nonce }}"{% endif %}>
+            // Collect and report performance metrics
+            window.addEventListener('load', function() {
+                if ('performance' in window) {
+                    const perfData = {
+                        dns: performance.timing.domainLookupEnd - performance.timing.domainLookupStart,
+                        connect: performance.timing.connectEnd - performance.timing.connectStart,
+                        ttfb: performance.timing.responseStart - performance.timing.navigationStart,
+                        load: performance.timing.loadEventEnd - performance.timing.navigationStart
+                    };
+                    // Send to your analytics service
+                    console.log('Performance metrics:', perfData);
+                }
+            });
+        </script>
 
-            {# Add your analytics scripts here with CSP nonce #}
-            {# <script nonce="{{ csp_nonce }}">
-               // Your analytics initialization code
-               </script> #}
-        {% endif %}
+        {# Add your analytics scripts here with CSP nonce #}
+        {# <script nonce="{{ csp_nonce }}">
+     // Your analytics initialization code
+ </script> #}
+      {% endif %}
     {% endblock %}
 
     {# ========================================
        FALLBACKS & DEBUG INFORMATION
        ======================================== #}
     <noscript>
-        <div class="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-md shadow-lg z-40">
-            {% trans "This site works best with JavaScript enabled." %}
-        </div>
+      <div class="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-md shadow-lg z-40">
+        {% trans "This site works best with JavaScript enabled." %}
+      </div>
     </noscript>
 
     {% if debug %}
-        <div class="fixed bottom-4 right-4 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded-md shadow-lg z-40">
-            <strong>{% trans "Development Mode" %}</strong>
-            <p class="text-sm">
-                {% trans "This site is running in debug mode." %}
-            </p>
-        </div>
+      <div class="fixed bottom-4 right-4 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded-md shadow-lg z-40">
+        <strong>{% trans "Development Mode" %}</strong>
+        <p class="text-sm">{% trans "This site is running in debug mode." %}</p>
+      </div>
     {% endif %}
-</body>
+  </body>
 </html>

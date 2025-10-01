@@ -339,7 +339,7 @@ class ThemeConfigSchema(BaseModel):
         valid_extensions = (".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".ico")
         if not any(v.lower().endswith(ext) for ext in valid_extensions):
             raise ValueError(
-                f"Image URL should end with one of: {', '.join(valid_extensions)}"
+                f"Image URL should end with one of: {", ".join(valid_extensions)}"
             )
 
         return v

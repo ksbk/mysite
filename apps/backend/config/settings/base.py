@@ -47,9 +47,6 @@ INSTALLED_APPS = [
     "compressor",
     "apps.core",
     "apps.pages",
-    "apps.projects",
-    "apps.blog",
-    "apps.contact",
 ]
 
 MIDDLEWARE = [

@@ -3,7 +3,6 @@ Custom admin widgets for better configuration UX.
 """
 
 import json
-from typing import Any
 
 from django import forms
 from django.utils.html import format_html

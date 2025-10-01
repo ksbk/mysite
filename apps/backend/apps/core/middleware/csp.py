@@ -3,7 +3,6 @@ Content Security Policy middleware with nonce generation.
 """
 
 import secrets
-from typing import Any
 
 from django.conf import settings
 from django.http import HttpRequest, HttpResponse

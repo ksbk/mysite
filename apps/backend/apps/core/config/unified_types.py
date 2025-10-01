@@ -99,4 +99,3 @@ def validate_config_structure(config_data: dict[str, Any]) -> bool:
 def get_config_version(config_data: dict[str, Any]) -> str:
     """Extract configuration version if available."""
     return config_data.get("_meta", {}).get("version", "1.0")
-

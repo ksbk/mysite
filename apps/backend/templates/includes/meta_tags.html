@@ -1,13 +1,10 @@
 {# Meta tags include #}
-<meta
-    name="description"
-    content="{% block meta_description %}{{ SITE.meta_description|default:''|truncatechars:160 }}{% endblock %}" />
-<meta
-    name="keywords"
-    content="{% block meta_keywords %}{{ SITE.meta_keywords|default:'' }}{% endblock %}" />
-<meta
-    name="author"
-    content="{% block meta_author %}{{ SITE.site_author|default:'MySite' }}{% endblock %}" />
-{% block robots %}{% if SITE.noindex %}
-<meta name="robots" content="noindex, nofollow" />
-{% endif %}{% endblock %}
+<meta name="description"
+      content="{% block meta_description %}{{ SITE.meta_description|default:''|truncatechars:160 }}{% endblock %}" />
+<meta name="keywords"
+      content="{% block meta_keywords %}{{ SITE.meta_keywords|default:'' }}{% endblock %}" />
+<meta name="author"
+      content="{% block meta_author %}{{ SITE.site_author|default:'MySite' }}{% endblock %}" />
+{% block robots %}
+  {% if SITE.noindex %}<meta name="robots" content="noindex, nofollow" />{% endif %}
+{% endblock %}

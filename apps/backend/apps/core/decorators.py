@@ -2,13 +2,12 @@
 Feature flag decorators for views and functions.
 """
 
-from functools import wraps
 from collections.abc import Callable
+from functools import wraps
 from typing import Any
 
 from django.http import Http404, HttpResponse
 from django.shortcuts import render
-
 from django.utils.decorators import method_decorator
 
 from ..config.loader import ConfigLoader

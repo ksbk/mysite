@@ -1,5 +1,0 @@
-{
-  // Allow long lines and inline HTML in Markdown
-  "MD013": false,
-  "MD033": false
-}

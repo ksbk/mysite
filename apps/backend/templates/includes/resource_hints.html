@@ -1,10 +1,19 @@
-{# Resource hints and preconnections #} {% block preconnect %} {% if VITE_DEV and
-VITE_DEV_AVAILABLE %}
-<link rel="preconnect" href="{{ VITE_DEV_SERVER_URL }}" crossorigin />
-<link rel="dns-prefetch" href="{{ VITE_DEV_SERVER_URL }}" />
-{% endif %} {# Add your CDN or analytics domains here #} {% if not debug and
-SITE.analytics_domain %}
-<link rel="dns-prefetch" href="{{ SITE.analytics_domain }}" />
-{% endif %} {% if SITE.cdn_domain %}
-<link rel="preconnect" href="{{ SITE.cdn_domain }}" crossorigin />
-{% endif %} {% endblock %}
+{# Resource hints and preconnections #}
+{% block preconnect %}
+
+  {% if VITE_DEV and
+    VITE_DEV_AVAILABLE %}
+    <link rel="preconnect" href="{{ VITE_DEV_SERVER_URL }}" crossorigin />
+    <link rel="dns-prefetch" href="{{ VITE_DEV_SERVER_URL }}" />
+  {% endif %}
+  {# Add your CDN or analytics domains here #}
+  {% if not debug and
+    SITE.analytics_domain %}
+    <link rel="dns-prefetch" href="{{ SITE.analytics_domain }}" />
+  {% endif %}
+
+  {% if SITE.cdn_domain %}
+    <link rel="preconnect" href="{{ SITE.cdn_domain }}" crossorigin />
+  {% endif %}
+
+{% endblock %}

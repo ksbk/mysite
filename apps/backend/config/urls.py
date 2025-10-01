@@ -23,10 +23,7 @@ from django.contrib import admin
 from django.urls import URLPattern, URLResolver, include, path
 
 urlpatterns: list[URLResolver | URLPattern] = [
-    path("", include("apps.pages.urls", namespace="pages")),
-    path("blog/", include("apps.blog.urls", namespace="blog")),
-    path("contact/", include("apps.contact.urls", namespace="contact")),
-    path("projects/", include("apps.projects.urls", namespace="projects")),
+    path("", include("apps.pages.urls")),
     path("admin/", admin.site.urls),
 ]
 

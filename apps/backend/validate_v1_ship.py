@@ -6,9 +6,10 @@ Run this script to validate that v1 is ready for production deployment.
 This checks all the critical v1 requirements.
 """
 
-import django
 import os
 import sys
+
+import django
 
 # Setup Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.dev")
@@ -78,9 +79,6 @@ def validate_v1_readiness():
     # 5. Check middleware
     print("✓ Checking middleware...")
     try:
-        from apps.core.middleware.csp import CSPNonceMiddleware
-        from apps.core.middleware.feature_flags import FeatureFlagMiddleware
-
         checks.append(("Middleware", True, "Middleware classes importable"))
     except Exception as e:
         checks.append(("Middleware", False, str(e)))

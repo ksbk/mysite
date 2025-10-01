@@ -6,18 +6,13 @@ import json
 
 from django import forms
 from django.contrib import admin
-from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from ..models import ContentConfig, SEOConfig, SiteConfig, ThemeConfig
 from .widgets import (
-    ColorWidget,
     FeatureFlagsWidget,
     NavigationWidget,
-    PrettyJSONWidget,
-    SEOPreviewWidget,
 )
-
 
 # Removed old inline classes - using separate admin classes instead
 
@@ -252,6 +247,9 @@ class SiteConfigAdmin(admin.ModelAdmin):
         ThemeConfig.load()
         ContentConfig.load()
 
+    @admin.display(
+        description="Feature Flags (JSON)"
+    )
     def feature_flags_display(self, obj):
         """Display feature flags as formatted JSON."""
         if not obj.feature_flags:
@@ -260,8 +258,10 @@ class SiteConfigAdmin(admin.ModelAdmin):
             f"<pre>{json.dumps(obj.feature_flags, indent=2, sort_keys=True)}</pre>"
         )
 
-    feature_flags_display.short_description = "Feature Flags (JSON)"
 
+    @admin.display(
+        description="Navigation (JSON)"
+    )
     def navigation_display(self, obj):
         """Display navigation as formatted JSON."""
         if not obj.navigation:
@@ -270,7 +270,6 @@ class SiteConfigAdmin(admin.ModelAdmin):
             f"<pre>{json.dumps(obj.navigation, indent=2, sort_keys=True)}</pre>"
         )
 
-    navigation_display.short_description = "Navigation (JSON)"
 
 
 # Admin classes defined above - no duplicates needed

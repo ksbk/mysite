@@ -56,7 +56,7 @@ class Command(BaseCommand):
 
         for cfg_type in config_types:
             self.stdout.write(
-                f"\n{self.style.HTTP_INFO(f'Validating {cfg_type} configuration...')}"
+                f"\n{self.style.HTTP_INFO(f"Validating {cfg_type} configuration...")}"
             )
 
             try:
@@ -86,7 +86,7 @@ class Command(BaseCommand):
                 total_errors += 1
 
         # Summary
-        self.stdout.write(f"\n{self.style.HTTP_INFO('Validation Summary:')}")
+        self.stdout.write(f"\n{self.style.HTTP_INFO("Validation Summary:")}")
         if total_errors == 0:
             self.stdout.write(self.style.SUCCESS("✓ All configurations are valid"))
         else:

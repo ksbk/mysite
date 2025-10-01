@@ -1,4 +1,6 @@
-{# Enhanced schema.org structured data #} {% load core_site %} {# Website schema markup
+{# Enhanced schema.org structured data #}
+{% load core_site %}
+{# Website schema markup
 #}
 <script
     type="application/ld+json"
@@ -11,27 +13,31 @@
     endif
     %}>
     {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      "name": "{{ SITE.site_name|default:'MySite'|escapejs }}",
-      "description": "{{ SITE.meta_description|default:'MySite - A modern Django + Vite application'|escapejs }}",
-      "url": "{{ request.build_absolute_uri|escapejs }}",
-      "author": {
-        "@type": "Organization",
-        "name": "{{ SITE.site_author|default:'MySite Team'|escapejs }}"
-      }
-      {% if SITE.search_url %},
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "{{ SITE.search_url|escapejs }}?q={search_term_string}",
-        "query-input": "required name=search_term_string"
-      }
-      {% endif %}
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "{{ SITE.site_name|default:'MySite'|escapejs }}",
+        "description": "{{ SITE.meta_description|default:'MySite - A modern Django + Vite application'|escapejs }}",
+        "url": "{{ request.build_absolute_uri|escapejs }}",
+        "author": {
+            "@type": "Organization",
+            "name": "{{ SITE.site_author|default:'MySite Team'|escapejs }}"
+        } {
+            %
+            if SITE.search_url %
+        },
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "{{ SITE.search_url|escapejs }}?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        } {
+            % endif %
+        }
     }
 </script>
 
-{# Organization schema markup #} {% if SITE.organization_name %}
-<script
+{# Organization schema markup #}
+{% if SITE.organization_name %}
+  <script
     type="application/ld+json"
     {%
     if
@@ -41,22 +47,28 @@
     {%
     endif
     %}>
-    {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "{{ SITE.organization_name|escapejs }}",
-      "url": "{{ request.build_absolute_uri|escapejs }}",
-      "description": "{{ SITE.meta_description|default:'MySite - A modern Django + Vite application'|escapejs }}"
-      {% if SITE.org_logo %},
-      "logo": "{{ SITE.org_logo|absolute_uri:request|escapejs }}"
-      {% endif %}
-      {% if SITE.org_contact_point %},
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "telephone": "{{ SITE.org_contact_point|escapejs }}",
-        "contactType": "Customer Service"
+      {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "{{ SITE.organization_name|escapejs }}",
+          "url": "{{ request.build_absolute_uri|escapejs }}",
+          "description": "{{ SITE.meta_description|default:'MySite - A modern Django + Vite application'|escapejs }}" {
+              %
+              if SITE.org_logo %
+          },
+          "logo": "{{ SITE.org_logo|absolute_uri:request|escapejs }}" {
+              % endif %
+          } {
+              %
+              if SITE.org_contact_point %
+          },
+          "contactPoint": {
+              "@type": "ContactPoint",
+              "telephone": "{{ SITE.org_contact_point|escapejs }}",
+              "contactType": "Customer Service"
+          } {
+              % endif %
+          }
       }
-      {% endif %}
-    }
-</script>
+  </script>
 {% endif %}

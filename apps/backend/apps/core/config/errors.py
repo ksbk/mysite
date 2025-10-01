@@ -227,4 +227,3 @@ class ConfigErrorHandler:
 # Global instances for consistent error handling
 config_logger = ConfigLogger()
 error_handler = ConfigErrorHandler(config_logger)
-

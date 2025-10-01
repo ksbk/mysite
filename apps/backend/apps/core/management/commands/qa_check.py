@@ -9,7 +9,8 @@ This module provides tools to validate the v1 "Ship It" criteria:
 - All critical functionality working
 """
 
-from typing import Dict, List, Any
+from typing import Any
+
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
@@ -28,7 +29,7 @@ class V1QualityChecklist:
             "functionality": {"status": "pending", "issues": []},
         }
 
-    def check_seo_basics(self) -> Dict[str, Any]:
+    def check_seo_basics(self) -> dict[str, Any]:
         """Check basic SEO requirements."""
         issues = []
         score = 100
@@ -80,7 +81,7 @@ class V1QualityChecklist:
             "issues": issues,
         }
 
-    def check_accessibility_basics(self) -> Dict[str, Any]:
+    def check_accessibility_basics(self) -> dict[str, Any]:
         """Check basic accessibility requirements."""
         issues = []
         score = 100
@@ -109,7 +110,7 @@ class V1QualityChecklist:
             "checklist": accessibility_checklist,
         }
 
-    def check_performance_basics(self) -> Dict[str, Any]:
+    def check_performance_basics(self) -> dict[str, Any]:
         """Check performance configuration."""
         issues = []
         score = 100
@@ -146,7 +147,7 @@ class V1QualityChecklist:
             "issues": issues,
         }
 
-    def check_security_basics(self) -> Dict[str, Any]:
+    def check_security_basics(self) -> dict[str, Any]:
         """Check security configuration."""
         issues = []
 
@@ -170,7 +171,7 @@ class V1QualityChecklist:
 
         return {"status": "pass" if len(issues) == 0 else "warning", "issues": issues}
 
-    def check_functionality(self) -> Dict[str, Any]:
+    def check_functionality(self) -> dict[str, Any]:
         """Check core functionality."""
         issues = []
 
@@ -196,7 +197,7 @@ class V1QualityChecklist:
 
         return {"status": "pass" if len(issues) == 0 else "fail", "issues": issues}
 
-    def run_full_check(self) -> Dict[str, Any]:
+    def run_full_check(self) -> dict[str, Any]:
         """Run complete v1 quality check."""
         self.results["seo"] = self.check_seo_basics()
         self.results["accessibility"] = self.check_accessibility_basics()
@@ -243,7 +244,7 @@ class Command(BaseCommand):
         # Display results
         self.display_results(results, show_fixes=options["fix"])
 
-    def display_results(self, results: Dict[str, Any], show_fixes: bool = False):
+    def display_results(self, results: dict[str, Any], show_fixes: bool = False):
         """Display formatted results."""
         self.stdout.write(self.style.HTTP_INFO("=" * 60))
         self.stdout.write(self.style.HTTP_INFO("V1 QUALITY ASSURANCE RESULTS"))
@@ -293,7 +294,7 @@ class Command(BaseCommand):
         if show_fixes:
             self.show_fix_suggestions(results)
 
-    def show_fix_suggestions(self, results: Dict[str, Any]):
+    def show_fix_suggestions(self, results: dict[str, Any]):
         """Show suggestions for fixing issues."""
         self.stdout.write(self.style.HTTP_INFO("\nFIX SUGGESTIONS:"))
         self.stdout.write("-" * 40)

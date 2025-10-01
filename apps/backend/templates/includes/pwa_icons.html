@@ -1,19 +1,17 @@
 {# PWA and icon links #} {% load static %} {# PWA and favicon icons #}
 <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}" />
 <link rel="alternate icon" href="{% static 'favicon.ico' %}" />
-<link rel="apple-touch-icon" href="{% static 'icons/apple-touch-icon.png' %}" />
+<link rel="apple-touch-icon"
+      href="{% static 'icons/apple-touch-icon.png' %}" />
 <link rel="manifest" href="{% static 'site.webmanifest' %}" />
 {% if SITE.mask_icon_color %}
-<link
-    rel="mask-icon"
-    href="{% static 'safari-pinned-tab.svg' %}"
-    color="{{ SITE.mask_icon_color }}" />
+  <link rel="mask-icon"
+        href="{% static 'safari-pinned-tab.svg' %}"
+        color="{{ SITE.mask_icon_color }}" />
 {% endif %}
-<meta
-    name="theme-color"
-    content="{{ SITE.theme_color_light|default:'#ffffff' }}"
-    media="(prefers-color-scheme: light)" />
-<meta
-    name="theme-color"
-    content="{{ SITE.theme_color_dark|default:'#0b0f19' }}"
-    media="(prefers-color-scheme: dark)" />
+<meta name="theme-color"
+      content="{{ SITE.theme_color_light|default:'#ffffff' }}"
+      media="(prefers-color-scheme: light)" />
+<meta name="theme-color"
+      content="{{ SITE.theme_color_dark|default:'#0b0f19' }}"
+      media="(prefers-color-scheme: dark)" />
