@@ -1,0 +1,88 @@
+{% load static %}
+{% load config_tags %}
+{% load core_vite %}
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    {% block meta %}
+      {% render_seo_meta %}
+    {% endblock meta %}
+
+    {% block extra_head %}
+    {% endblock extra_head %}
+
+    <!-- Vite Assets -->
+    {% vite_hmr %}
+    {% block vite_assets %}
+      {% vite_asset "src/main.ts" %}
+    {% endblock vite_assets %}
+
+    {% block extra_css %}
+    {% endblock extra_css %}
+  </head>
+  <body class="h-full bg-white dark:bg-gray-900">
+    {% block header %}
+      <header class="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between h-16">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <h1 class="text-xl font-bold text-gray-900 dark:text-white">
+                  {% config "site.site_name" %}
+                </h1>
+              </div>
+            </div>
+
+            {% block navigation %}
+              {% render_navigation %}
+            {% endblock navigation %}
+          </div>
+        </nav>
+      </header>
+    {% endblock header %}
+
+    <main class="min-h-screen">
+      {% block messages %}
+        {% if messages %}
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            {% for message in messages %}
+              <div class="mb-4 p-4 rounded-md {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endblock messages %}
+
+      {% block breadcrumbs %}
+      {% endblock breadcrumbs %}
+
+      {% block content %}
+      {% endblock content %}
+    </main>
+
+    {% block footer %}
+      <footer class="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+          <div class="text-center text-sm text-gray-600 dark:text-gray-400">
+            <p>&copy; {% now "Y" %} {% config "site.site_name" %}. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
+    {% endblock footer %}
+
+    {% block extra_js %}
+    {% endblock extra_js %}
+
+    <!-- CSP Nonce for inline scripts -->
+    {% if CSP_NONCE %}
+      <script nonce="{{ CSP_NONCE }}">
+          // Bootstrap application
+          console.log('Application loaded');
+      </script>
+    {% endif %}
+  </body>
+</html>

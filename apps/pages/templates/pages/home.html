@@ -1,0 +1,23 @@
+{% extends "core/base.html" %}
+
+{% block title %}Welcome to {{ SITE.site.site_name }}{% endblock %}
+
+{% block content %}
+  <main class="flex-1">
+    <div class="container mx-auto px-4 py-8">
+      <div class="max-w-4xl mx-auto text-center">
+        <h1 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+          {{ SITE.site.site_name }}
+        </h1>
+
+        {% if SITE.site.site_tagline %}
+          <p class="text-xl text-gray-600 mb-8">{{ SITE.site.site_tagline }}</p>
+        {% endif %}
+
+        <div class="prose prose-lg mx-auto">
+          <p>Welcome to our website. This is the v1 configuration system in action!</p>
+        </div>
+      </div>
+    </div>
+  </main>
+{% endblock %}

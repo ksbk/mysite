@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "compressor",
     "apps.core",
     "apps.pages",
     "apps.projects",
@@ -59,6 +60,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "apps.core.middleware.csp_nonce.CSPNonceMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -71,10 +73,12 @@ TEMPLATES = [
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
+                "django.template.context_processors.i18n",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "apps.core.context_processors.vite",
-                "apps.core.context_processors.site",
+                "apps.core.context_processors.site_context",
+                "apps.core.context_processors.security",
             ],
         },
     },
@@ -158,3 +162,22 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SESSION_COOKIE_SECURE = False  # set True in prod.py
 CSRF_COOKIE_SECURE = False  # set True in prod.py
 REFERRER_POLICY = "strict-origin-when-cross-origin"
+
+# Content Security Policy
+CSP_NONCE_ENABLED = os.environ.get("CSP_NONCE_ENABLED", "False").lower() == "true"
+
+# Django Compressor
+COMPRESS_ENABLED = not DEBUG
+COMPRESS_OFFLINE = True
+COMPRESS_CSS_HASHING_METHOD = "content"
+COMPRESS_JS_HASHING_METHOD = "content"
+COMPRESSOR_FINDERS = [
+    "compressor.finders.CompressorFinder",
+]
+
+# Add compressor to static files finders
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "compressor.finders.CompressorFinder",
+]

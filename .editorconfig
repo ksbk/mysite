@@ -12,17 +12,33 @@ trim_trailing_whitespace = true
 indent_size = 4
 
 [*.html]
-indent_size = 4
+indent_size = 2
+
+[*.{htm,html}]
+indent_size = 2
+
+# Django templates should follow HTML standards, not Python
+[apps/backend/**/*.html]
+indent_size = 2
 
 [*.md]
 trim_trailing_whitespace = false
 
-[*.{js,jsx,ts,tsx,json,css,scss,yaml,yml}]
+[*.{js,jsx,ts,tsx,json,css,scss,sass,less,yaml,yml,toml}]
+indent_size = 2
+
+[*.{xml,svg}]
 indent_size = 2
 
 [Makefile]
 indent_style = tab
 
-[*.{sh,bash}]
+[*.{sh,bash,zsh}]
 indent_size = 2
 end_of_line = lf
+
+[*.{cfg,ini,conf}]
+indent_size = 4
+
+[.{prettierrc,eslintrc,babelrc}*]
+indent_size = 2

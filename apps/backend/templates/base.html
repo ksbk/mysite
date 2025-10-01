@@ -1,95 +1,234 @@
 {% load static %}
 {% load core_vite %}
+{% load core_site %}
+{% load i18n %}
+{% load compress %}
+
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        {# djlint:off #}
-      <meta charset="UTF-8"/>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-      <meta name="color-scheme" content="light dark"/>
-      <meta name="referrer" content="strict-origin-when-cross-origin"/>
-      <meta name="description" content="{% block meta_description %}{{ SITE.meta_description }}{% endblock %}"/>
-      <meta name="keywords" content="{% block meta_keywords %}{{ SITE.meta_keywords }}{% endblock %}"/>
-      <meta name="author" content="{% block meta_author %}MySite{% endblock %}"/>
-      <!-- Open Graph -->
-      <meta property="og:type" content="website"/>
-      <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}"/>
-      <meta property="og:title" content="{% block og_title %}{{ SITE.site_name }}{% endblock %}"/>
-      <meta property="og:description" content="{% block og_description %}MySite - A modern Django + Vite application{% endblock %}"/>
-      <!-- Twitter Cards -->
-      <meta property="twitter:card" content="summary_large_image"/>
-      <meta property="twitter:url" content="{% block twitter_url %}{{ request.build_absolute_uri }}{% endblock %}"/>
-      <meta property="twitter:title" content="{% block twitter_title %}{{ SITE.site_name }}{% endblock %}"/>
-      <meta property="twitter:description" content="{% block twitter_description %}MySite - A modern Django + Vite application{% endblock %}"/>
-      <title>{% block title %}{{ SITE.site_name }}{% endblock %}</title>
-      <!-- Favicons -->
-      <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}"/>
-      <link rel="alternate icon" href="{% static 'favicon.ico' %}"/>
-      {% block preconnect %}{% if VITE_DEV and VITE_DEV_AVAILABLE %}<link rel="preconnect" href="{{ VITE_DEV_SERVER_URL }}"/>{% endif %}{% endblock %}
-        {# djlint:on #}
-        {% block head_extra %}{% endblock %}
-        {# Assets: dev uses HMR when server is available; prod uses manifest #}
-        {% if VITE_DEV and VITE_DEV_AVAILABLE %}
-            {% vite_hmr %}
-        {% else %}
-            {% vite_asset 'src/main.ts' %}
+    <html lang="{{ LANGUAGE_CODE|default:'en' }}"
+          dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
+<head>
+    {# ========================================
+       CORE META TAGS & DOCUMENT SETTINGS
+       ======================================== #}
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta name="color-scheme" content="light dark"/>
+    <meta name="referrer" content="strict-origin-when-cross-origin"/>
+
+    {# ========================================
+       SEO & SOCIAL MEDIA META TAGS
+       ======================================== #}
+    {% include "includes/meta_tags.html" %}
+    {% include "includes/og_tags.html" %}
+    {% include "includes/twitter_tags.html" %}
+
+    {# ========================================
+       PAGE TITLE
+       ======================================== #}
+    <title>{% block title %}{{ SITE.site_name|default:'MySite' }}{% endblock %}</title>
+
+    {# ========================================
+       PWA & PERFORMANCE OPTIMIZATIONS
+       ======================================== #}
+    {% include "includes/pwa_icons.html" %}
+    {% include "includes/resource_hints.html" %}
+
+    {# ========================================
+       CANONICAL URL & SECURITY TOKENS
+       ======================================== #}
+    <link rel="canonical" href="{{ SITE.canonical_url|default:request.build_absolute_uri }}"/>
+
+    {% if csrf_token and csrf_token != 'NOTPROVIDED' %}
+        <meta name="csrf-token" content="{{ csrf_token }}"/>
+    {% endif %}
+
+    {% if csp_nonce %}
+        <meta name="csp-nonce" content="{{ csp_nonce }}"/>
+    {% endif %}
+
+    {# ========================================
+       STRUCTURED DATA & SCHEMA MARKUP
+       ======================================== #}
+    {% block structured_data %}
+        {% include "includes/structured_data.html" %}
+        {% if SITE.json_ld %}
+            {% render_json_ld SITE.json_ld %}
         {% endif %}
+    {% endblock %}
+
+    {# ========================================
+       ADDITIONAL HEAD CONTENT
+       ======================================== #}
+    {% block head_extra %}{% endblock %}
+
+    {# ========================================
+       CRITICAL CSS & VITE ASSETS
+       ======================================== #}
+    {% if VITE_DEV and VITE_DEV_AVAILABLE %}
+        {# Development: Vite HMR for hot module replacement #}
+        {% vite_hmr %}
+    {% else %}
+        {# Production: Preload critical resources for performance #}
+        {% block critical_css %}
+            <link rel="preload" as="style" href="{% static 'dist/assets/main.css' %}"
+                  onload="this.onload=null;this.rel='stylesheet'"/>
+            <noscript>
+                <link rel="stylesheet" href="{% static 'dist/assets/main.css' %}"/>
+            </noscript>
+        {% endblock %}
+        {% vite_asset 'src/main.ts' %}
+    {% endif %}
+
+    {# ========================================
+       COMPRESSED & ADDITIONAL CSS
+       ======================================== #}
+    {% compress css %}
         {% block css %}{% endblock %}
-        {% block extra_css %}{% endblock %}
-    </head>
-    <body class="{% block body_class %}bg-white text-slate-900 antialiased{% endblock %}">
-        <!-- Skip to main content -->
-        <a href="#main-content"
-           class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50 transition-all duration-200">Skip to main content
-        </a>
-        <!-- Header -->
-        {% block header %}
-            {% include "components/header.html" %}
-        {% endblock %}
-        {% block messages %}
+    {% endcompress %}
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="bg-white text-slate-900 antialiased {% block body_class %}{% endblock %}">
+    {# ========================================
+       ACCESSIBILITY: SKIP TO MAIN CONTENT
+       ======================================== #}
+    <a href="#main-content"
+       class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50 transition-all duration-200">
+        {% trans "Skip to main content" %}
+    </a>
+
+    {# ========================================
+       SITE HEADER & NAVIGATION
+       ======================================== #}
+    {% block header %}
+        {% include "components/header.html" %}
+    {% endblock %}
+
+    {# ========================================
+       USER MESSAGES & NOTIFICATIONS
+       ======================================== #}
+    {% block messages %}
+        <div aria-live="polite">
             {% include "components/messages.html" %}
-        {% endblock %}
-        {% block breadcrumbs %}
-            {% include "components/breadcrumbs.html" %}
-        {% endblock %}
-        <!-- Main Content Area -->
-        {% block main %}
-            <main id="main-content" role="main" class="flex-1">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div class="prose prose-lg max-w-none">
-                        {% block content %}
-                            <!-- Default content fallback -->
-                            <div class="text-center py-12">
-                                <h1 class="text-4xl font-bold text-gray-900 mb-4">Welcome to MySite</h1>
-                                <p class="text-xl text-gray-600 max-w-2xl mx-auto">A modern Django + Vite application built with best practices.</p>
-                            </div>
-                        {% endblock %}
-                    </div>
+        </div>
+    {% endblock %}
+
+    {# ========================================
+       BREADCRUMB NAVIGATION
+       ======================================== #}
+    {% block breadcrumbs %}
+        {% include "components/breadcrumbs.html" %}
+    {% endblock %}
+
+    {# ========================================
+       MAIN CONTENT AREA
+       ======================================== #}
+    {% block main %}
+        <main id="main-content" class="flex-1" role="main">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                {# Apply typography classes for article-like content #}
+                <div class="{% block prose_wrapper_class %}prose prose-lg max-w-none{% endblock %}">
+                    {% block content %}
+                        {# Default hero section - override in child templates #}
+                        <div class="text-center py-12">
+                            <h1 class="text-4xl font-bold text-gray-900 mb-4">
+                                {{ SITE.hero_title|default:"Welcome to MySite" }}
+                            </h1>
+                            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                                {{ SITE.hero_subtitle|default:"A modern Django + Vite application built with best practices." }}
+                            </p>
+                        </div>
+                    {% endblock %}
                 </div>
-            </main>
-        {% endblock %}
-        <!-- Footer -->
-        {% block footer %}
-            {% include "components/footer.html" %}
-        {% endblock %}
-        <!-- JavaScript Assets -->
+            </div>
+        </main>
+    {% endblock %}
+
+    {# ========================================
+       SITE FOOTER
+       ======================================== #}
+    {% block footer %}
+        {% include "components/footer.html" %}
+    {% endblock %}
+
+    {# ========================================
+       JAVASCRIPT & SCRIPTS
+       ======================================== #}
+    {% compress js %}
         {% block js %}{% endblock %}
-        {% block extra_js %}{% endblock %}
-        <!-- Analytics and Tracking -->
-        {% block analytics %}
-            {% if not DEBUG %}<!-- Production analytics scripts go here -->{% endif %}
-        {% endblock %}
-        <noscript>
-            <div class="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-md shadow-lg z-40">
-                This site works best with JavaScript enabled.
-            </div>
-        </noscript>
-        <!-- Development Banner -->
-        {% if DEBUG %}
-            <div class="fixed bottom-4 right-4 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded-md shadow-lg z-40">
-                <strong>Development Mode</strong>
-                <p class="text-sm">This site is running in debug mode.</p>
-            </div>
+    {% endcompress %}
+
+    {% block extra_js %}{% endblock %}
+
+    {# ========================================
+       PWA SERVICE WORKER (Production Only)
+       ======================================== #}
+    {% block service_worker %}
+        {% if not debug %}
+            <script{% if csp_nonce %} nonce="{{ csp_nonce }}"{% endif %}>
+                // Register service worker for offline functionality
+                if ('serviceWorker' in navigator) {
+                    window.addEventListener('load', function() {
+                        navigator.serviceWorker.register('/sw.js')
+                            .then(function(registration) {
+                                console.log('Service Worker registered:', registration);
+                            })
+                            .catch(function(registrationError) {
+                                console.log('Service Worker registration failed:', registrationError);
+                            });
+                    });
+                }
+            </script>
         {% endif %}
-    </body>
+    {% endblock %}
+
+    {# ========================================
+       ANALYTICS & PERFORMANCE MONITORING
+       ======================================== #}
+    {% block analytics %}
+        {% if not debug %}
+            {# Performance monitoring script #}
+            <script{% if csp_nonce %} nonce="{{ csp_nonce }}"{% endif %}>
+                // Collect and report performance metrics
+                window.addEventListener('load', function() {
+                    if ('performance' in window) {
+                        const perfData = {
+                            dns: performance.timing.domainLookupEnd - performance.timing.domainLookupStart,
+                            connect: performance.timing.connectEnd - performance.timing.connectStart,
+                            ttfb: performance.timing.responseStart - performance.timing.navigationStart,
+                            load: performance.timing.loadEventEnd - performance.timing.navigationStart
+                        };
+                        // Send to your analytics service
+                        console.log('Performance metrics:', perfData);
+                    }
+                });
+            </script>
+
+            {# Add your analytics scripts here with CSP nonce #}
+            {# <script nonce="{{ csp_nonce }}">
+               // Your analytics initialization code
+               </script> #}
+        {% endif %}
+    {% endblock %}
+
+    {# ========================================
+       FALLBACKS & DEBUG INFORMATION
+       ======================================== #}
+    <noscript>
+        <div class="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded-md shadow-lg z-40">
+            {% trans "This site works best with JavaScript enabled." %}
+        </div>
+    </noscript>
+
+    {% if debug %}
+        <div class="fixed bottom-4 right-4 bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded-md shadow-lg z-40">
+            <strong>{% trans "Development Mode" %}</strong>
+            <p class="text-sm">
+                {% trans "This site is running in debug mode." %}
+            </p>
+        </div>
+    {% endif %}
+</body>
 </html>

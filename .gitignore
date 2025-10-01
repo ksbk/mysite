@@ -237,3 +237,11 @@ Thumbs.db
 /apps/backend/media/
 /apps/backend/static/
 /apps/backend/staticfiles/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+node_modules/
+.env

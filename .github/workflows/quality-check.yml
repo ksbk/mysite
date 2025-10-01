@@ -1,0 +1,173 @@
+name: Quality Check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1"
+  push:
+    branches:
+      - main
+      - release/**
+  pull_request:
+    branches: ["**"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.13"
+  NODE_VERSION: "20"
+
+jobs:
+  quality:
+    name: End-to-end quality baseline
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install backend dependencies
+        run: |
+          uv venv .venv
+          uv pip install --python .venv/bin/python -e .[dev]
+
+      - name: Prepare report directories
+        run: |
+          mkdir -p tests/reports/python
+          mkdir -p tests/reports/frontend
+
+      - name: Ruff (JSON)
+        run: |
+          set -o pipefail
+          uv run ruff check . --output-format json | tee tests/reports/python/ruff.json
+
+      - name: MyPy (typed checks)
+        run: |
+          set -o pipefail
+          uv run mypy --config-file mypy.ini --pretty | tee tests/reports/python/mypy.txt
+
+      - name: Django system check (deploy profile)
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings.test
+        run: |
+          uv run python apps/backend/manage.py check --deploy | tee tests/reports/python/django-check.txt
+
+      - name: djLint (Django templates)
+        run: |
+          set -o pipefail
+          uv run djlint apps/backend/templates --profile=django --lint --json | tee tests/reports/python/djlint.json
+
+      - name: Bandit (security)
+        run: |
+          uv run bandit -r apps/backend -f json -o tests/reports/python/bandit.json
+
+      - name: Detect secrets scan
+        run: |
+          uv run detect-secrets scan > tests/reports/python/detect-secrets.json
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: apps/frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: |
+          if [ -f apps/frontend/package-lock.json ]; then npm --prefix apps/frontend ci; else npm --prefix apps/frontend install; fi
+
+      - name: ESLint (JSON)
+        run: |
+          set -o pipefail
+          npm --prefix apps/frontend run lint -- --format json --output-file ../../tests/reports/frontend/eslint.json
+
+      - name: Prettier check
+        run: |
+          npx --yes prettier --check "apps/frontend/**/*.{ts,tsx,js,jsx,css,scss,html,json}" > tests/reports/frontend/prettier.txt
+
+      - name: Vite production build
+        run: |
+          npm --prefix apps/frontend run build
+          tar -czf tests/reports/frontend/dist.tgz -C apps/frontend dist
+
+      - name: Lighthouse & accessibility audits
+        run: |
+          npm --prefix apps/frontend run preview -- --host 0.0.0.0 --port 4173 >/tmp/vite-preview.log 2>&1 &
+          PREVIEW_PID=$!
+          trap "kill $PREVIEW_PID 2>/dev/null" EXIT
+          npx --yes wait-on http://127.0.0.1:4173 --timeout 60000
+          npx --yes lighthouse http://127.0.0.1:4173 --quiet --chrome-flags="--headless --no-sandbox" --output json --output html --output-path tests/reports/frontend/lighthouse
+          npx --yes @axe-core/cli http://127.0.0.1:4173 --output tests/reports/frontend/axe.json
+
+      - name: Generate quality summary
+        run: |
+          python - <<'PY'
+          import datetime as dt
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path("tests/reports")
+          entries = {
+              "ruff": "python/ruff.json",
+              "mypy": "python/mypy.txt",
+              "django_check": "python/django-check.txt",
+              "djlint": "python/djlint.json",
+              "bandit": "python/bandit.json",
+              "detect_secrets": "python/detect-secrets.json",
+              "eslint": "frontend/eslint.json",
+              "prettier": "frontend/prettier.txt",
+              "vite_build": "frontend/dist.tgz",
+              "lighthouse": "frontend/lighthouse.report.html",
+              "lighthouse_json": "frontend/lighthouse.report.json",
+              "axe": "frontend/axe.json",
+          }
+
+          report = {
+              "commit": os.environ.get("GITHUB_SHA", ""),
+              "date": dt.datetime.utcnow().isoformat() + "Z",
+              "overall": None,
+              "checks": {},
+          }
+
+          for name, rel in entries.items():
+              path = root / rel
+              report["checks"][name] = {
+                  "status": "present" if path.exists() else "missing",
+                  "artifact": rel,
+              }
+
+          root.mkdir(parents=True, exist_ok=True)
+          (root / "quality-summary.json").write_text(json.dumps(report, indent=2))
+          PY
+
+      - name: Append summary to history log
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          root = Path("tests/reports")
+          history = root / "history.jsonl"
+          summary = (root / "quality-summary.json").read_text()
+
+          history.parent.mkdir(parents=True, exist_ok=True)
+          with history.open("a", encoding="utf-8") as fh:
+              fh.write(summary.strip())
+              fh.write("\n")
+          PY
+
+      - name: Upload quality artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-reports
+          path: tests/reports
+          retention-days: 14
