@@ -2,16 +2,7 @@
 {% load core_site %}
 {# Website schema markup
 #}
-<script
-    type="application/ld+json"
-    {%
-    if
-    csp_nonce
-    %}
-    nonce="{{ csp_nonce }}"
-    {%
-    endif
-    %}>
+<script type="application/ld+json" {% if csp_nonce %}nonce="{{ csp_nonce }}"{% endif %}>
     {
         "@context": "https://schema.org",
         "@type": "WebSite",
@@ -34,10 +25,9 @@
         }
     }
 </script>
-
 {# Organization schema markup #}
 {% if SITE.organization_name %}
-  <script
+    <script
     type="application/ld+json"
     {%
     if
@@ -70,5 +60,5 @@
               % endif %
           }
       }
-  </script>
+    </script>
 {% endif %}

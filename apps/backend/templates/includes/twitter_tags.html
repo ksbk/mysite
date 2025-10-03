@@ -6,6 +6,4 @@
       content="{% block twitter_title %}{{ SITE.site_name|default:'MySite' }}{% endblock %}" />
 <meta name="twitter:description"
       content="{% block twitter_description %}{{ SITE.og_description|default:'MySite - A modern Django + Vite application' }}{% endblock %}" />
-{% if SITE.twitter_site %}
-  <meta name="twitter:site" content="{{ SITE.twitter_site }}" />
-{% endif %}
+{% if SITE.twitter_site %}<meta name="twitter:site" content="{{ SITE.twitter_site }}" />{% endif %}

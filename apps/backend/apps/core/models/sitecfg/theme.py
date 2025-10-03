@@ -26,6 +26,14 @@ class ThemeConfig(TimeStampedModel, SingletonModel):
         help_text=_("Secondary brand color (hex format)"),
         verbose_name=_("Secondary Color"),
     )
+
+    tritiary_color = models.CharField(
+        max_length=7,
+        default="#ffffff",
+        help_text=_("Tritiary brand color (hex format)"),
+        verbose_name=_("Tritiary Color"),
+    )
+
     favicon_url = models.URLField(
         blank=True,
         help_text=_("URL to favicon file"),

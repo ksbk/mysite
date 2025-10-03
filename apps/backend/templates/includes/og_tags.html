@@ -8,10 +8,8 @@
 <meta property="og:description"
       content="{% block og_description %}{{ SITE.og_description|default:'MySite - A modern Django + Vite application' }}{% endblock %}" />
 {% block og_image %}
-
-  {% if SITE.og_image %}
-    <meta property="og:image"
-          content="{{ SITE.og_image|absolute_uri:request }}" />
-  {% endif %}
-
+    {% if SITE.og_image %}
+        <meta property="og:image"
+              content="{{ SITE.og_image|absolute_uri:request }}" />
+    {% endif %}
 {% endblock %}

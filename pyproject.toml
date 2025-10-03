@@ -13,6 +13,7 @@ dependencies = [
   # Optional production server; useful when deploying
   "gunicorn>=21.2.0",
   "django-compressor>=4.5.1",
+  "pydantic-settings>=2.11.0",
 ]
 
 [project.optional-dependencies]
@@ -26,6 +27,7 @@ dev = [
   "pytest-django>=4.0.0",
   "pytest-cov>=4.0.0",
   "coverage>=7.6.0",
+  "factory-boy>=3.3.0",
   # Django handy tools
   "django-extensions>=3.2.0",
   "django-debug-toolbar>=4.0.0",
@@ -84,3 +86,34 @@ plugins = ["mypy_django_plugin.main"]
 
 [tool.django-stubs]
 django_settings_module = "config.settings.base"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.dev"
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-q",
+    "--reuse-db",
+    "--strict-markers",
+    "--strict-config",
+    # Coverage options (uncomment for full test runs)
+    # "--cov=apps.backend",
+    # "--cov-report=term-missing",
+    # "--cov-report=html:htmlcov",
+    # "--cov-fail-under=70",
+]
+testpaths = [
+    "apps/backend/config/tests",
+    "apps/backend/apps/*/tests",
+]
+markers = [
+    "unit: fast tests that don't hit the database",
+    "integration: tests that touch the database or multiple layers",
+    "slow: optional long-running tests",
+    "django_db: mark test to use database",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]

@@ -7,7 +7,18 @@
         <title>frontend</title>
     </head>
     <body>
-        <div id="app"></div>
+        <div id="app">
+            <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+                <div class="text-center">
+                    <div data-component="Hello" data-name="World" class="text-6xl font-bold text-indigo-600 mb-4 min-h-[100px] flex items-center justify-center bg-white/10 rounded-lg border-2 border-indigo-200"></div>
+                    <p class="text-xl text-gray-600 mb-8">Your Django + Vite + TypeScript + Tailwind setup is working!</p>
+                    <div class="space-y-2 text-sm text-gray-500">
+                        <p>🚀 Vite Dev Server: <span class="font-mono">http://localhost:5173</span></p>
+                        <p>🐍 Django Backend: <span class="font-mono">http://127.0.0.1:8002</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
         <script type="module" src="/src/main.ts"></script>
     </body>
 </html>

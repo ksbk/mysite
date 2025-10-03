@@ -17,7 +17,7 @@ django.setup()
 
 from django.core.management import call_command
 
-from apps.core.config import ConfigService
+from apps.core.sitecfg import ConfigService
 
 
 def validate_v1_readiness():
@@ -52,7 +52,7 @@ def validate_v1_readiness():
     # 3. Check cache functionality
     print("✓ Checking cache functionality...")
     try:
-        from apps.core.config.cache import cache_manager
+        from apps.core.sitecfg.cache import cache_manager
 
         test_key = cache_manager.get_site_config_key()
         cache_manager.set(test_key, {"test": True})

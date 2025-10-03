@@ -5,9 +5,9 @@
       href="{% static 'icons/apple-touch-icon.png' %}" />
 <link rel="manifest" href="{% static 'site.webmanifest' %}" />
 {% if SITE.mask_icon_color %}
-  <link rel="mask-icon"
-        href="{% static 'safari-pinned-tab.svg' %}"
-        color="{{ SITE.mask_icon_color }}" />
+    <link rel="mask-icon"
+          href="{% static 'safari-pinned-tab.svg' %}"
+          color="{{ SITE.mask_icon_color }}" />
 {% endif %}
 <meta name="theme-color"
       content="{{ SITE.theme_color_light|default:'#ffffff' }}"

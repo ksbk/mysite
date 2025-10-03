@@ -19,7 +19,10 @@ help:
 	@echo "  make check-vite - Check Vite dev server availability"
 	@echo "  make build      - Build frontend and collect static files"
 	@echo "  make migrate    - Run Django migrations"
-	@echo "  make test       - Run Django tests"
+	@echo "  make test       - Run ALL tests (Django + TypeScript)"
+	@echo "  make test-backend - Run Django contact app tests only"
+	@echo "  make test-frontend - Run TypeScript tests only"
+	@echo "  make test-all-django - Run all Django tests across all apps"
 	@echo "  make clean      - Clean build artifacts"
 	@echo "  make tree       - Generate pretty repository tree structure"
 
@@ -87,8 +90,26 @@ migrate:
 	@echo "✅ Migrations complete!"
 
 test:
-	@echo "🧪 Running Django tests..."
-	source .venv/bin/activate && cd apps/backend && python manage.py test -v 2
+	@echo "🧪 Running ALL tests (Django + TypeScript)..."
+	@echo "📋 Backend Tests:"
+	@make test-backend
+	@echo ""
+	@echo "📋 Frontend Tests:"
+	@make test-frontend
+	@echo ""
+	@echo "✅ All tests complete!"
+
+test-backend:
+	@echo "🐍 Running Django tests..."
+	source .venv/bin/activate && cd apps/backend && python manage.py test apps.contact.tests -v 2
+
+test-frontend:
+	@echo "⚡ Running TypeScript tests..."
+	cd apps/frontend && npm run test:run
+
+test-all-django:
+	@echo "🐍 Running ALL Django tests..."
+	source .venv/bin/activate && cd apps/backend && python manage.py test --discover-runner=django.test.runner.DiscoverRunner -v 2
 
 lint:
 	@echo "🧹 Linting Python (ruff) and Frontend (eslint)..."

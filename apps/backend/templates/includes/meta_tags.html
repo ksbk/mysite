@@ -6,5 +6,5 @@
 <meta name="author"
       content="{% block meta_author %}{{ SITE.site_author|default:'MySite' }}{% endblock %}" />
 {% block robots %}
-  {% if SITE.noindex %}<meta name="robots" content="noindex, nofollow" />{% endif %}
+    {% if SITE.noindex %}<meta name="robots" content="noindex, nofollow" />{% endif %}
 {% endblock %}

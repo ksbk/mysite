@@ -1,27 +1,33 @@
 """Development settings.
 
 This module extends base settings; star import is intentional for Django settings.
+Overrides are minimal since base.py now uses typed environment settings.
 """
 
 # ruff: noqa: F401, F403
 
-import os
-from pathlib import Path
-
-from dotenv import load_dotenv
-
 from .base import *
+from .env import get_settings
 
-# Load environment variables from .env file
-ENV_FILE = Path(__file__).resolve().parent.parent.parent.parent / ".env"
-if ENV_FILE.exists():
-    load_dotenv(ENV_FILE)
+# Get typed settings (cached from base.py)
+env = get_settings()
 
+# Force DEBUG on in development
 DEBUG = True
 
-# Email in development: print emails to the console
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@mysite.local")
+# Development-specific feature flags
+if env.ENABLE_DEBUG_TOOLBAR and DEBUG:
+    INSTALLED_APPS.append("debug_toolbar")
+    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
 
-# Vite dev server URL for template tag helpers
-VITE_DEV_SERVER_URL = os.environ.get("VITE_DEV_SERVER_URL", "http://localhost:5173")
+    # Debug toolbar configuration
+    INTERNAL_IPS = ["127.0.0.1", "localhost"]
+
+# Development email configuration (override base.py)
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# Development compression settings (override base.py)
+# Disable offline compression in development to avoid manifest issues
+if env.ENABLE_COMPRESSION:
+    COMPRESS_OFFLINE = False  # Generate on-the-fly in development
+    COMPRESS_ENABLED = True  # Still compress, but not offline

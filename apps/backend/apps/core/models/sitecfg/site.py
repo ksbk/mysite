@@ -1,9 +1,15 @@
 """Site configuration model."""
 
+from django.core.validators import RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from ..base import SingletonModel, TimeStampedModel
+
+DOMAIN_VALIDATION_REGEX = RegexValidator(
+    regex=r"^(?=.{1,255}$)([a-zA-Z0-9-]{1,63}\.)+[A-Za-z]{2,63}$",
+    message=_("Enter a valid domain like 'example.com' (no scheme or path)."),
+)
 
 
 class SiteConfig(TimeStampedModel, SingletonModel):
