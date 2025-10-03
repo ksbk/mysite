@@ -193,7 +193,7 @@ class ContactAPIViewTest(TestCase):
             self.api_url,
             data=json.dumps(data),
             content_type="application/json",
-            headers={"x-requested-with": "XMLHttpRequest"}
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
 
         self.assertEqual(response.status_code, 200)
@@ -221,7 +221,7 @@ class ContactAPIViewTest(TestCase):
             self.api_url,
             data=json.dumps(data),
             content_type="application/json",
-            headers={"x-requested-with": "XMLHttpRequest"}
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
 
         self.assertEqual(response.status_code, 400)
@@ -290,7 +290,7 @@ class ContactIntegrationTest(TestCase):
             api_url,
             data=json.dumps(data),
             content_type="application/json",
-            headers={"x-requested-with": "XMLHttpRequest"}
+            headers={"x-requested-with": "XMLHttpRequest"},
         )
 
         # 3. Verify API response
