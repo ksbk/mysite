@@ -1,0 +1,185 @@
+name: Deploy
+
+on:
+    push:
+        branches: [main]
+    release:
+        types: [published]
+    workflow_dispatch:
+        inputs:
+            environment:
+                description: "Environment to deploy to"
+                required: true
+                default: "staging"
+                type: choice
+                options:
+                    - staging
+                    - production
+
+env:
+    PYTHON_VERSION: "3.11"
+    NODE_VERSION: "20"
+
+jobs:
+    deploy-staging:
+        name: Deploy to Staging
+        runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging')
+        environment:
+            name: staging
+            url: ${{ steps.deploy.outputs.url }}
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: ${{ env.PYTHON_VERSION }}
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: "npm"
+                  cache-dependency-path: apps/frontend/package-lock.json
+
+            - name: Install uv
+              uses: astral-sh/setup-uv@v4
+
+            - name: Install dependencies
+              run: |
+                  uv venv .venv
+                  uv pip install --python .venv/bin/python -e .
+
+            - name: Install frontend dependencies
+              working-directory: apps/frontend
+              run: npm ci
+
+            - name: Build frontend
+              working-directory: apps/frontend
+              run: npm run build
+
+            - name: Collect static files
+              working-directory: apps/backend
+              run: |
+                  source ../../.venv/bin/activate
+                  python manage.py collectstatic --noinput
+              env:
+                  DJANGO_SETTINGS_MODULE: config.settings.staging
+                  SECRET_KEY: ${{ secrets.STAGING_SECRET_KEY }}
+                  DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+
+            - name: Run database migrations
+              working-directory: apps/backend
+              run: |
+                  source ../../.venv/bin/activate
+                  python manage.py migrate
+              env:
+                  DJANGO_SETTINGS_MODULE: config.settings.staging
+                  SECRET_KEY: ${{ secrets.STAGING_SECRET_KEY }}
+                  DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+
+            # Railway deployment (example)
+            - name: Deploy to Railway (Staging)
+              id: deploy
+              run: |
+                  echo "Deploying to Railway staging environment..."
+                  echo "url=https://mysite-staging.railway.app" >> $GITHUB_OUTPUT
+              # You would add actual Railway CLI commands here
+              # railway login --token ${{ secrets.RAILWAY_TOKEN }}
+              # railway up --service staging
+
+    deploy-production:
+        name: Deploy to Production
+        runs-on: ubuntu-latest
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+        environment:
+            name: production
+            url: ${{ steps.deploy.outputs.url }}
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version: ${{ env.PYTHON_VERSION }}
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: "npm"
+                  cache-dependency-path: apps/frontend/package-lock.json
+
+            - name: Install uv
+              uses: astral-sh/setup-uv@v4
+
+            - name: Install dependencies
+              run: |
+                  uv venv .venv
+                  uv pip install --python .venv/bin/python -e .
+
+            - name: Install frontend dependencies
+              working-directory: apps/frontend
+              run: npm ci
+
+            - name: Build frontend
+              working-directory: apps/frontend
+              run: npm run build
+
+            - name: Collect static files
+              working-directory: apps/backend
+              run: |
+                  source ../../.venv/bin/activate
+                  python manage.py collectstatic --noinput
+              env:
+                  DJANGO_SETTINGS_MODULE: config.settings.prod
+                  SECRET_KEY: ${{ secrets.PRODUCTION_SECRET_KEY }}
+                  DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+
+            - name: Run database migrations
+              working-directory: apps/backend
+              run: |
+                  source ../../.venv/bin/activate
+                  python manage.py migrate
+              env:
+                  DJANGO_SETTINGS_MODULE: config.settings.prod
+                  SECRET_KEY: ${{ secrets.PRODUCTION_SECRET_KEY }}
+                  DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
+
+            # Railway deployment (example)
+            - name: Deploy to Railway (Production)
+              id: deploy
+              run: |
+                  echo "Deploying to Railway production environment..."
+                  echo "url=https://mysite.railway.app" >> $GITHUB_OUTPUT
+              # You would add actual Railway CLI commands here
+              # railway login --token ${{ secrets.RAILWAY_TOKEN }}
+              # railway up --service production
+
+    # Slack/Discord notification example
+    notify:
+        name: Notify Deployment
+        runs-on: ubuntu-latest
+        needs: [deploy-staging, deploy-production]
+        if: always()
+
+        steps:
+            - name: Notify Slack
+              if: always()
+              run: |
+                  if [ "${{ needs.deploy-staging.result }}" == "success" ] || [ "${{ needs.deploy-production.result }}" == "success" ]; then
+                    echo "✅ Deployment successful!"
+                    # curl -X POST -H 'Content-type: application/json' \
+                    #   --data '{"text":"🚀 MyStite deployed successfully!"}' \
+                    #   ${{ secrets.SLACK_WEBHOOK_URL }}
+                  else
+                    echo "❌ Deployment failed!"
+                    # curl -X POST -H 'Content-type: application/json' \
+                    #   --data '{"text":"❌ MyStite deployment failed!"}' \
+                    #   ${{ secrets.SLACK_WEBHOOK_URL }}
+                  fi

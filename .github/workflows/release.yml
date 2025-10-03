@@ -1,0 +1,216 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      changelog: ${{ steps.changelog.outputs.changelog }}
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Get version
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          VERSION="${{ github.event.inputs.version }}"
+        else
+          VERSION=${GITHUB_REF#refs/tags/}
+        fi
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo "Version: ${VERSION}"
+    
+    - name: Generate changelog
+      id: changelog
+      run: |
+        # Generate changelog from git commits since last tag
+        LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+        if [ -n "$LAST_TAG" ]; then
+          CHANGELOG=$(git log --pretty=format:"- %s (%h)" ${LAST_TAG}..HEAD)
+        else
+          CHANGELOG=$(git log --pretty=format:"- %s (%h)" HEAD)
+        fi
+        
+        echo "changelog<<EOF" >> $GITHUB_OUTPUT
+        echo "$CHANGELOG" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+    
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.version.outputs.version }}
+        name: Release ${{ steps.version.outputs.version }}
+        body: |
+          # Release ${{ steps.version.outputs.version }}
+          
+          ## What's Changed
+          ${{ steps.changelog.outputs.changelog }}
+          
+          ## Full Changelog
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/${{ steps.version.outputs.version }}...HEAD
+        draft: false
+        prerelease: ${{ contains(steps.version.outputs.version, '-') }}
+
+  build-and-test:
+    name: Build and Test Release
+    runs-on: ubuntu-latest
+    needs: create-release
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+        cache: 'npm'
+        cache-dependency-path: apps/frontend/package-lock.json
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+    
+    - name: Install dependencies
+      run: |
+        uv venv
+        uv pip install --python .venv/bin/python -e .
+    
+    - name: Install frontend dependencies
+      working-directory: apps/frontend
+      run: npm ci
+    
+    - name: Run full test suite
+      run: |
+        source .venv/bin/activate
+        cd apps/backend
+        python manage.py test apps.contact.tests -v 2
+      env:
+        DJANGO_SETTINGS_MODULE: config.settings.test
+        SECRET_KEY: test-secret-key-for-release
+    
+    - name: Run frontend tests
+      working-directory: apps/frontend
+      run: npm run test:run
+    
+    - name: Build production assets
+      working-directory: apps/frontend
+      run: npm run build
+    
+    - name: Collect static files
+      working-directory: apps/backend
+      run: |
+        source ../../.venv/bin/activate
+        python manage.py collectstatic --noinput
+      env:
+        DJANGO_SETTINGS_MODULE: config.settings.prod
+        SECRET_KEY: test-secret-key-for-release
+        DATABASE_URL: sqlite:///release_test.db
+    
+    - name: Create distribution package
+      run: |
+        source .venv/bin/activate
+        python -m pip install build
+        python -m build
+    
+    - name: Upload release artifacts
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ needs.create-release.outputs.version }}
+        files: |
+          dist/*
+          apps/backend/staticfiles/**/*
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [create-release, build-and-test]
+    environment: production
+    if: ${{ !contains(needs.create-release.outputs.version, '-') }}  # Only for stable releases
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+        cache: 'npm'
+        cache-dependency-path: apps/frontend/package-lock.json
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+    
+    - name: Install dependencies
+      run: |
+        uv venv
+        uv pip install --python .venv/bin/python -e .
+    
+    - name: Install frontend dependencies
+      working-directory: apps/frontend
+      run: npm ci
+    
+    - name: Build production frontend
+      working-directory: apps/frontend
+      run: npm run build
+    
+    - name: Deploy to production
+      run: |
+        echo "🚀 Deploying release ${{ needs.create-release.outputs.version }} to production"
+        # Add your production deployment commands here
+        # Example for Railway:
+        # railway login --token ${{ secrets.RAILWAY_TOKEN }}
+        # railway up --service production
+        
+        # Example for Heroku:
+        # heroku container:login
+        # heroku container:push web --app mysite-production
+        # heroku container:release web --app mysite-production
+        
+        # Example for DigitalOcean App Platform:
+        # doctl apps create-deployment ${{ secrets.DO_APP_ID }}
+
+  notify-release:
+    name: Notify Release
+    runs-on: ubuntu-latest
+    needs: [create-release, build-and-test, deploy-production]
+    if: always()
+    
+    steps:
+    - name: Notify team
+      run: |
+        if [ "${{ needs.deploy-production.result }}" == "success" ] || [ "${{ needs.deploy-production.result }}" == "skipped" ]; then
+          echo "✅ Release ${{ needs.create-release.outputs.version }} completed successfully!"
+          # Send Slack/Discord notification
+          # curl -X POST -H 'Content-type: application/json' \
+          #   --data '{"text":"🎉 MyStite ${{ needs.create-release.outputs.version }} released!"}' \
+          #   ${{ secrets.SLACK_WEBHOOK_URL }}
+        else
+          echo "❌ Release ${{ needs.create-release.outputs.version }} failed!"
+        fi

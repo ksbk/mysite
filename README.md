@@ -1,5 +1,9 @@
 # 🚀 MySite - Full-Stack Django + TypeScript Website
 
+[![CI](https://github.com/ksbk/mysite/actions/workflows/ci.yml/badge.svg)](https://github.com/ksbk/mysite/actions/workflows/ci.yml)
+[![Quality Check](https://github.com/ksbk/mysite/actions/workflows/quality-check.yml/badge.svg)](https://github.com/ksbk/mysite/actions/workflows/quality-check.yml)
+[![Deploy](https://github.com/ksbk/mysite/actions/workflows/deploy.yml/badge.svg)](https://github.com/ksbk/mysite/actions/workflows/deploy.yml)
+
 A modern, production-ready web application built with Django backend and TypeScript frontend, featuring comprehensive testing, modern build pipeline, and clean architecture.
 
 ## ✨ Features

@@ -74,5 +74,8 @@ jobs:
       - name: Lint (eslint)
         run: npm run lint
 
+      - name: Run TypeScript tests
+        run: npm run test:run
+
       - name: Build (vite)
         run: npm run build
