@@ -17,19 +17,32 @@ def site_context(request: HttpRequest) -> dict[str, Any]:
 
 
 def vite(request: HttpRequest) -> dict[str, Any]:
-    """Add Vite configuration to template context."""
+    """Add Vite configuration to template context.
+
+    Provides both backward-compatible top-level variables used in templates and
+    a nested `vite` object for structured access.
+    """
     from django.conf import settings
 
-    return {
+    dev_server_url = getattr(settings, "VITE_DEV_SERVER_URL", "http://localhost:5173")
+    is_dev = bool(getattr(settings, "VITE_DEV", settings.DEBUG))
+    # Only probe HMR when dev is intended
+    hmr_available = _check_vite_available(dev_server_url) if is_dev else False
+
+    ctx = {
+        # Backward-compatible variables used in templates/includes
+        "VITE_DEV": is_dev,
+        "VITE_DEV_SERVER_URL": dev_server_url,
+        "VITE_DEV_AVAILABLE": hmr_available,
+        # Structured object for future templates
         "vite": {
-            "is_dev": settings.DEBUG,
-            "dev_server_url": getattr(
-                settings, "VITE_DEV_SERVER_URL", "http://localhost:5173"
-            ),
+            "is_dev": is_dev,
+            "dev_server_url": dev_server_url,
             "assets": {},
-            "hmr_available": False,
-        }
+            "hmr_available": hmr_available,
+        },
     }
+    return ctx
 
 
 def security(request: HttpRequest) -> dict[str, Any]:

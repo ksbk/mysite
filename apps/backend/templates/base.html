@@ -63,16 +63,9 @@
             {# Development: Vite HMR for hot module replacement #}
             {% vite_hmr %}
         {% else %}
-            {# Production: Preload critical resources for performance #}
+            {# Production: Load assets via Vite manifest; override critical_css if needed #}
             {% block critical_css %}
-                <link rel="preload"
-                      as="style"
-                      href="{% static 'dist/assets/main.css' %}"
-                      onload="this.onload=null;this.rel='stylesheet'" />
-                <noscript>
-                    <link rel="stylesheet" href="{% static 'dist/assets/main.css' %}" />
-                </noscript>
-            {% endblock %}
+            {% endblock critical_css %}
             {% vite_asset 'src/main.ts' %}
         {% endif %}
         {# ========================================
