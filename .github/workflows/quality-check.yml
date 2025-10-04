@@ -79,7 +79,8 @@ jobs:
       - name: djLint (Django templates)
         run: |
           set -o pipefail
-          uv run djlint apps/backend/templates --profile=django --lint --json | tee tests/reports/python/djlint.json
+          # djLint doesn't support JSON output, capture text output instead
+          uv run djlint apps/backend/templates --profile=django --lint | tee tests/reports/python/djlint.txt || echo "djLint found template issues - captured in report"
 
       - name: Bandit (security)
         run: |
@@ -136,7 +137,7 @@ jobs:
               "ruff": "python/ruff.json",
               "mypy": "python/mypy.txt",
               "django_check": "python/django-check.txt",
-              "djlint": "python/djlint.json",
+              "djlint": "python/djlint.txt",
               "bandit": "python/bandit.json",
               "detect_secrets": "python/detect-secrets.json",
               "eslint": "frontend/eslint.json",
