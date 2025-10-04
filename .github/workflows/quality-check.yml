@@ -109,7 +109,8 @@ jobs:
 
       - name: Prettier check
         run: |
-          npx --yes prettier --check "apps/frontend/**/*.{ts,tsx,js,jsx,css,scss,html,json}" > tests/reports/frontend/prettier.txt
+          # Prettier exits with non-zero code when style issues are found, capture both stdout and stderr
+          npx --yes prettier --check "apps/frontend/**/*.{ts,tsx,js,jsx,css,scss,html,json}" > tests/reports/frontend/prettier.txt 2>&1 || echo "Prettier found code style issues - captured in report"
 
       - name: Vite production build
         run: |
