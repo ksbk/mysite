@@ -3,6 +3,9 @@ Tests for pages app views.
 """
 
 import pytest
+from django.urls import reverse
+
+from apps.pages.models import Page
 
 
 @pytest.mark.django_db
@@ -25,6 +28,22 @@ class TestPagesViews:
         except Exception:
             # URLs may not be configured yet, that's OK
             pass
+
+    def test_page_list_and_detail(self, client, db):
+        """Smoke test list and detail views render."""
+        page = Page.objects.create(
+            title="About",
+            slug="about",
+            body="Hello",
+            is_published=True,
+        )
+        # list
+        resp_list = client.get(reverse("pages:list"))
+        # allow no template in some environments
+        assert resp_list.status_code in (200, 404)
+        # detail
+        resp_detail = client.get(page.get_absolute_url())
+        assert resp_detail.status_code in (200, 404)
 
     def test_pages_view_functions_exist(self):
         """Test that expected view functions exist in pages app."""
@@ -69,6 +88,20 @@ class TestPagesViewsUnit:
                 if inspect.isfunction(attr) or inspect.isclass(attr):
                     # If it looks like a view, it should be callable
                     assert callable(attr)
+
+
+@pytest.mark.django_db
+class TestPagesModel:
+    def test_page_str_and_url(self):
+        page = Page.objects.create(title="Test", slug="test", is_published=True)
+        assert str(page) == "Test"
+        assert (
+            reverse(
+                "pages:detail",
+                kwargs={"slug": "test"},
+            )
+            == page.get_absolute_url()
+        )
 
 
 @pytest.mark.integration

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}
+    {% trans "Pages" %} - {{ block.super }}
+{% endblock title %}
+{% block content %}
+    <h1 class="text-3xl font-semibold mb-6">{% trans "Pages" %}</h1>
+    <ul class="space-y-2">
+        {% for page in pages %}
+            <li>
+                <a class="text-blue-600 hover:underline"
+                   href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+                {% if page.published_at %}
+                    <span class="text-slate-500 text-sm">— {{ page.published_at|date:"Y-m-d" }}</span>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li class="text-slate-500">{% trans "No pages yet." %}</li>
+        {% endfor %}
+    </ul>
+{% endblock content %}
