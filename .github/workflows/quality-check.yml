@@ -115,7 +115,8 @@ jobs:
       - name: Vite production build
         run: |
           npm --prefix apps/frontend run build
-          tar -czf tests/reports/frontend/dist.tgz -C apps/frontend dist
+          # Vite outputs to ../backend/static/dist relative to frontend directory
+          tar -czf tests/reports/frontend/dist.tgz -C apps/backend/static dist
 
       - name: Lighthouse & accessibility audits
         run: |
