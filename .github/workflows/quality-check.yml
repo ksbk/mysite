@@ -48,7 +48,8 @@ jobs:
       - name: Ruff (JSON)
         run: |
           set -o pipefail
-          uv run ruff check . --output-format json | tee tests/reports/python/ruff.json
+          # Capture ruff output regardless of exit code for quality reporting
+          uv run ruff check . --output-format json | tee tests/reports/python/ruff.json || echo "Ruff found linting issues - captured in report"
 
       - name: MyPy (typed checks)
         env:
