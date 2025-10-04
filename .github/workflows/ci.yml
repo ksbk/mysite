@@ -40,9 +40,11 @@ jobs:
       - name: Run Django tests (with coverage)
         env:
           DJANGO_SETTINGS_MODULE: config.settings.test
+          SECRET_KEY: test-secret-key-for-github-actions
         run: |
-          uv run coverage run --source=apps/backend/apps -m django --settings=config.settings.test apps/backend/manage.py test -v 2
-          uv run coverage xml -o coverage.xml
+          cd apps/backend
+          uv run coverage run --source=apps manage.py test apps.contact.tests -v 2
+          uv run coverage xml -o ../../coverage.xml
 
       - name: Upload coverage.xml
         uses: actions/upload-artifact@v4

@@ -58,6 +58,7 @@ jobs:
       - name: Django system check (deploy profile)
         env:
           DJANGO_SETTINGS_MODULE: config.settings.test
+          SECRET_KEY: test-secret-key-for-ci
         run: |
           uv run python apps/backend/manage.py check --deploy | tee tests/reports/python/django-check.txt
 
