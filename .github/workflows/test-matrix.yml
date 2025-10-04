@@ -55,7 +55,7 @@ jobs:
               run: uv venv
 
             - name: Install Python dependencies
-              run: uv pip install --python .venv/bin/python -e .
+              run: uv pip install -e .
 
             - name: Install frontend dependencies
               working-directory: apps/frontend
@@ -63,11 +63,9 @@ jobs:
 
             - name: Run backend tests
               working-directory: apps/backend
-              run: |
-                  source ../../.venv/bin/activate
-                  python manage.py test apps.contact.tests -v 2
-              shell: bash
+              run: uv run python manage.py test apps.contact.tests -v 2
               env:
+                  DJANGO_SETTINGS_MODULE: config.settings.test
                   SECRET_KEY: test-secret-key-for-matrix-testing
 
             - name: Run frontend tests

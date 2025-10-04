@@ -53,7 +53,7 @@ jobs:
       - name: MyPy (typed checks)
         run: |
           set -o pipefail
-          uv run mypy --config-file mypy.ini --pretty | tee tests/reports/python/mypy.txt
+          uv run mypy --pretty . | tee tests/reports/python/mypy.txt
 
       - name: Django system check (deploy profile)
         env:

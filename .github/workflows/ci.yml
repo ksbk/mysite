@@ -43,7 +43,7 @@ jobs:
           SECRET_KEY: test-secret-key-for-github-actions
         run: |
           cd apps/backend
-          uv run coverage run --source=apps manage.py test apps.contact.tests -v 2
+          uv run coverage run --source=. manage.py test apps.contact.tests -v 2
           uv run coverage xml -o ../../coverage.xml
 
       - name: Upload coverage.xml
@@ -70,8 +70,7 @@ jobs:
           cache-dependency-path: apps/frontend/package-lock.json
 
       - name: Install dependencies
-        run: |
-          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+        run: npm ci
 
       - name: Lint (eslint)
         run: npm run lint
