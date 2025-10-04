@@ -25,8 +25,8 @@ SECURE_HSTS_SECONDS = min(env.SECURE_HSTS_SECONDS, 86400)  # Max 1 day
 
 # Staging-specific features
 if env.ENABLE_DEBUG_TOOLBAR:
-    INSTALLED_APPS.append("debug_toolbar")
-    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
+    INSTALLED_APPS.append("debug_toolbar")  # noqa: F405
+    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")  # noqa: F405
     INTERNAL_IPS = ["127.0.0.1", "10.0.0.0/8"]  # Include private networks
 
 # Email configuration (usually console or test SMTP for staging)
@@ -86,5 +86,5 @@ if env.CACHE_URL:
 
 # Static files optimization for staging (production parity)
 if env.ENABLE_WHITENOISE:
-    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")  # noqa: F405
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

@@ -22,9 +22,9 @@ import django
 
 django.setup()
 
-from django.test import Client
+from django.test import Client  # noqa: E402
 
-from apps.contact.models import ContactMessage
+from apps.contact.models import ContactMessage  # noqa: E402
 
 
 def print_header(title):
@@ -88,7 +88,7 @@ def test_django_backend():
 
         passed = (
             response.status_code == 200
-            and response_data.get("success") == True
+            and response_data.get("success")
             and final_count == initial_count + 1
         )
 
@@ -122,7 +122,7 @@ def test_django_backend():
         response_data = json.loads(response.content) if response.content else {}
         passed = (
             response.status_code == 400
-            and response_data.get("success") == False
+            and not response_data.get("success")
             and "errors" in response_data
         )
 

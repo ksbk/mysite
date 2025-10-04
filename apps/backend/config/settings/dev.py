@@ -17,8 +17,8 @@ DEBUG = True
 
 # Development-specific feature flags
 if env.ENABLE_DEBUG_TOOLBAR and DEBUG:
-    INSTALLED_APPS.append("debug_toolbar")
-    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
+    INSTALLED_APPS.append("debug_toolbar")  # noqa: F405  (imported via base settings)
+    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")  # noqa: F405
 
     # Debug toolbar configuration
     INTERNAL_IPS = ["127.0.0.1", "localhost"]

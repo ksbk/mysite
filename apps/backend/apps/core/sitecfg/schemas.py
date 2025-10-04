@@ -91,7 +91,7 @@ class NavItem(BaseModel):
 if PydanticAvailable:
     try:
         NavItem.model_rebuild()
-    except Exception:
+    except Exception:  # nosec B110 - acceptable fallback when pydantic isn't installed
         pass
 
 

@@ -147,7 +147,7 @@ class Settings(BaseSettings):
     def _split_hosts(cls, v) -> list[str]:
         if v is None:
             return ["localhost", "127.0.0.1"]
-        if isinstance(v, (list, tuple)):
+        if isinstance(v, list | tuple):
             return [str(h).strip() for h in v if str(h).strip()]
         return [h.strip() for h in str(v).split(",") if h.strip()]
 

@@ -25,7 +25,9 @@ def request_factory():
 def test_user():
     """Create a test user for authentication tests."""
     return User.objects.create_user(
-        username="testuser", email="test@example.com", password="testpass123"
+        username="testuser",
+        email="test@example.com",
+        password="testpass123",  # pragma: allowlist secret (test-only)
     )
 
 
@@ -35,7 +37,7 @@ def staff_user():
     return User.objects.create_user(
         username="staffuser",
         email="staff@example.com",
-        password="staffpass123",
+        password="staffpass123",  # nosec B106 (test-only)
         is_staff=True,
     )
 
@@ -44,7 +46,9 @@ def staff_user():
 def superuser():
     """Create a superuser for admin tests."""
     return User.objects.create_superuser(
-        username="admin", email="admin@example.com", password="adminpass123"
+        username="admin",
+        email="admin@example.com",
+        password="adminpass123",  # nosec B106 (test-only)
     )
 
 

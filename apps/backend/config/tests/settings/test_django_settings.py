@@ -206,7 +206,7 @@ class TestPathResolution(DjangoTestCase):
         # Each directory should be Path-like or string
         for static_dir in settings.STATICFILES_DIRS:
             self.assertTrue(
-                isinstance(static_dir, (str, os.PathLike)),
+                isinstance(static_dir, str | os.PathLike),
                 f"Static directory {static_dir} should be Path-like",
             )
 

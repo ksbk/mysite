@@ -273,7 +273,8 @@ class TestLoggingIntegration(DjangoTestCase):
         self.assertTrue(self.logger.isEnabledFor(logging.INFO))
 
         # Since we can see in the test output that the logging format
-        # includes the request ID (captured stderr shows "[e2e12345] INFO: Test log message"),
+        # includes the request ID (captured stderr shows
+        # "[e2e12345] INFO: Test log message"),
         # the integration is working correctly
 
 

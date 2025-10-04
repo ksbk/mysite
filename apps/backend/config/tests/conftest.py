@@ -17,13 +17,16 @@ from django.test import override_settings
 def temp_env_file():
     """Create a temporary .env file for testing env parsing."""
     with tempfile.NamedTemporaryFile(mode="w", suffix=".env", delete=False) as f:
-        f.write("""# Test environment variables
-DEBUG=True
-SECRET_KEY=test-secret-key-for-testing
-DATABASE_URL=sqlite:///test.db
-ALLOWED_HOSTS=localhost,127.0.0.1
-CORS_ALLOWED_ORIGINS=http://localhost:3000
-""")
+        content = (
+            "# Test environment variables\n"
+            "DEBUG=True\n"
+            "SECRET_KEY=test-secret-key-for-testing "
+            "# pragma: allowlist secret (test-only)\n"
+            "DATABASE_URL=sqlite:///test.db\n"
+            "ALLOWED_HOSTS=localhost,127.0.0.1\n"
+            "CORS_ALLOWED_ORIGINS=http://localhost:3000\n"
+        )
+        f.write(content)
         f.flush()
         yield f.name
     os.unlink(f.name)
@@ -34,7 +37,7 @@ def mock_env_vars():
     """Mock environment variables for testing."""
     env_vars = {
         "DEBUG": "False",
-        "SECRET_KEY": "mock-secret-key",
+        "SECRET_KEY": "mock-secret-key",  # pragma: allowlist secret (test-only)
         "DATABASE_URL": "sqlite:///mock.db",
         "ALLOWED_HOSTS": "testserver",
         "CORS_ALLOWED_ORIGINS": "http://testserver",
@@ -48,7 +51,7 @@ def mock_env_vars():
 def minimal_settings():
     """Minimal Django settings for testing configuration loading."""
     return {
-        "SECRET_KEY": "test-key",
+        "SECRET_KEY": "test-key",  # pragma: allowlist secret (test-only)
         "DEBUG": True,
         "DATABASES": {
             "default": {

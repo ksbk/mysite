@@ -15,9 +15,9 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.dev")
 django.setup()
 
-from django.core.management import call_command
+from django.core.management import call_command  # noqa: E402
 
-from apps.core.sitecfg import ConfigService
+from apps.core.sitecfg import ConfigService  # noqa: E402
 
 
 def validate_v1_readiness():
@@ -70,8 +70,8 @@ def validate_v1_readiness():
     try:
         from django.template.loader import get_template
 
-        base_template = get_template("core/base.html")
-        error_template = get_template("404.html")
+        get_template("core/base.html")  # Check template exists
+        get_template("404.html")  # Check template exists
         checks.append(("Template system", True, "Templates loading correctly"))
     except Exception as e:
         checks.append(("Template system", False, str(e)))

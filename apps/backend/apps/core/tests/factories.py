@@ -156,15 +156,15 @@ class ConfigFactoryMixin:
     @factory.trait
     def with_user(self):
         """Add a created_by user to the factory."""
-        created_by = factory.SubFactory(UserFactory)
+        self.created_by = factory.SubFactory(UserFactory)
 
     @factory.trait
     def maintenance_mode(self):
         """Create config with maintenance mode enabled."""
-        maintenance_mode = True
+        self.maintenance_mode = True
 
     @factory.trait
     def production_ready(self):
         """Create production-ready config."""
-        maintenance_mode = False
+        self.maintenance_mode = False
         # Add any other production-specific settings

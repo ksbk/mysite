@@ -68,7 +68,7 @@ DISCORD_WEBHOOK_URL        # Discord webhook for notifications
 ### Production Environment
 - **Name**: `production`
 - **URL**: Set in deployment workflow
-- **Protection Rules**: 
+- **Protection Rules**:
   - Required reviewers: 1+
   - Restrict to main branch only
 

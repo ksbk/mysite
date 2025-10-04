@@ -92,12 +92,12 @@ if env.CACHE_URL:
 
 # Static files optimization for production
 if env.ENABLE_WHITENOISE:
-    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")  # noqa: F405
     STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Disable admin in production if configured
 if not env.ENABLE_ADMIN:
     try:
-        INSTALLED_APPS.remove("django.contrib.admin")
+        INSTALLED_APPS.remove("django.contrib.admin")  # noqa: F405
     except ValueError:
         pass  # Already removed

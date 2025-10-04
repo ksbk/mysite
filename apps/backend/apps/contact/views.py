@@ -65,7 +65,8 @@ class ContactFormView(CreateView):
         # Add success message
         messages.success(
             self.request,
-            f"Thanks {form.cleaned_data["name"]}! We received your message and will respond soon.",
+            f"Thanks {form.cleaned_data["name"]}! "
+            f"We received your message and will respond soon.",
         )
 
         # Optional: Send email notification to admin
@@ -126,7 +127,9 @@ class ContactAPIView(FormView):
 
                 return JsonResponse({
                     "success": True,
-                    "message": f"Thanks {contact_message.name}! We received your message.",
+                    "message": (
+                        f"Thanks {contact_message.name}! We received your message."
+                    ),
                     "data": {
                         "id": contact_message.id,
                         "created_at": contact_message.created_at.isoformat(),

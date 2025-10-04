@@ -1,0 +1,2 @@
+# Dev-only requirements for pre-commit hooks and local tooling
+# Intentionally minimal; project dev dependencies are managed via pyproject extras

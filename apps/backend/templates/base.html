@@ -13,6 +13,11 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="color-scheme" content="light dark" />
+        {# Basic SEO tags to satisfy linters; child templates/includes can override #}
+        <meta name="description"
+              content="{{ SITE.meta_description|default:'A modern Django + Vite application.' }}" />
+        <meta name="keywords"
+              content="{{ SITE.meta_keywords|default:'django, vite, typescript, web' }}" />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
         {# ========================================
        SEO & SOCIAL MEDIA META TAGS

@@ -36,6 +36,9 @@ export default [
       // Relaxed rules for this demo project
       "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/no-explicit-any": "warn",
+      // Disable rule causing runtime error under flat config in this setup
+      "@typescript-eslint/no-unused-expressions": "off",
+      "no-unused-expressions": "off",
     },
   },
   {

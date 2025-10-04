@@ -14,7 +14,7 @@ from typing import Any
 from django import template
 from django.conf import settings
 from django.templatetags.static import static
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html, format_html_join
 
 register = template.Library()
 
@@ -23,11 +23,17 @@ register = template.Library()
 def vite_hmr(entry: str = "src/main.ts") -> str:
     """Return minimal Vite HMR script tags for development."""
     dev_url = getattr(settings, "VITE_DEV_SERVER_URL", "http://localhost:5173")
-    html = (
-        f'<script type="module" src="{dev_url}/@vite/client"></script>'
-        f'<script type="module" src="{dev_url}/{entry}"></script>'
+    return format_html(
+        "{}{}",
+        format_html(
+            '<script type="module" src="{}"></script>',
+            f"{dev_url}/@vite/client",
+        ),
+        format_html(
+            '<script type="module" src="{}"></script>',
+            f"{dev_url}/{entry}",
+        ),
     )
-    return mark_safe(html)
 
 
 _manifest_cache: dict[str, Any] = {"path": None, "mtime": None, "data": None}
@@ -71,7 +77,7 @@ def vite_asset(entry: str = "src/main.ts") -> str:
         # Fallback to a predictable path (non-hashed) if no manifest yet
         # Keep aligned with Vite's default assetsDir structure
         src = static("dist/js/main.js")
-        return mark_safe(f'<script type="module" src="{src}"></script>')
+        return format_html('<script type="module" src="{}"></script>', src)
 
     entry_info = manifest.get(entry)
     if not entry_info:
@@ -80,15 +86,24 @@ def vite_asset(entry: str = "src/main.ts") -> str:
     if not entry_info:
         return ""  # nothing to include
 
+    # Build safe tags
     tags: list[str] = []
     # JS entry
     file_path = entry_info.get("file")
     if file_path:
         tags.append(
-            f'<script type="module" src="{static("dist/" + file_path)}"></script>'
+            format_html(
+                '<script type="module" src="{}"></script>', static("dist/" + file_path)
+            )
         )
     # CSS assets
     for css_path in entry_info.get("css", []):
-        tags.append(f'<link rel="stylesheet" href="{static("dist/" + css_path)}" />')
+        tags.append(
+            format_html(
+                '<link rel="stylesheet" href="{}" />',
+                static("dist/" + css_path),
+            )
+        )
 
-    return mark_safe("\n".join(tags))
+    # Join tags safely
+    return format_html_join("\n", "{}", ((t,) for t in tags))

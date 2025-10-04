@@ -174,7 +174,12 @@ class TestEnvironmentSettings(TestCase):
         """Test that SecretStr fields are properly redacted."""
         with unittest.mock.patch.dict(
             os.environ,
-            {"SECRET_KEY": "super-secret-key", "EMAIL_HOST_PASSWORD": "email-password"},
+            {
+                # pragma: allowlist secret (test-only)
+                "SECRET_KEY": "super-secret-key",
+                # pragma: allowlist secret (test-only)
+                "EMAIL_HOST_PASSWORD": "email-password",
+            },
         ):
             settings = Settings()
 

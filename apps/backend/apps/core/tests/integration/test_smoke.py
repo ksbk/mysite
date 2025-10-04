@@ -140,7 +140,7 @@ class ConfigurationHealthTest(TestCase):
             response = self.client.get("/admin/sitecfg/health/")
             # Should either work or redirect/forbid, but not crash
             self.assertLess(response.status_code, 500)
-        except:
+        except Exception:
             # Endpoint might not be configured, which is fine for smoke test
             pass
 

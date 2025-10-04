@@ -11,9 +11,9 @@ if backend_dir not in sys.path:
 # Set Django settings module for tests
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.test")
 
-import django
-from django.conf import settings
-from django.test.utils import get_runner
+import django  # noqa: E402
+from django.conf import settings  # noqa: E402
+from django.test.utils import get_runner  # noqa: E402
 
 
 def run_settings_tests():

@@ -53,11 +53,25 @@ def vite_context(request: HttpRequest) -> dict[str, Any]:
 
 
 def _check_vite_available(url: str) -> bool:
-    """Check if Vite development server is available at the given URL."""
-    try:
-        import urllib.request
+    """Check if Vite development server is available at the given URL.
 
-        urllib.request.urlopen(url, timeout=1)
-        return True
+    Security hardening:
+    - Only allow http/https schemes
+    - Only allow localhost/127.0.0.1 host (dev-only)
+    - Use a HEAD request with short timeout
+    """
+    try:
+        from urllib.parse import urlparse
+        from urllib.request import Request, urlopen
+
+        parsed = urlparse(url)
+        if parsed.scheme not in ("http", "https"):
+            return False  # nosec B310: restrict to safe schemes
+        if parsed.hostname not in ("localhost", "127.0.0.1"):
+            return False  # dev server should only be local
+
+        req = Request(url, method="HEAD")
+        with urlopen(req, timeout=1) as resp:  # nosec B310: scheme/host validated
+            return 200 <= getattr(resp, "status", 200) < 500
     except Exception:
         return False

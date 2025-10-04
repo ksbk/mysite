@@ -30,7 +30,8 @@ def config_changed(**kwargs):
 
     if sender and instance:
         logger.debug(
-            f"Config cache invalidated: {sender.__name__} {signal_name} (ID: {instance.pk})"
+            f"Config cache invalidated: {sender.__name__} {signal_name} "
+            f"(ID: {instance.pk})"
         )
     else:
         logger.debug("Config cache invalidated")

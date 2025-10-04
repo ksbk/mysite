@@ -118,7 +118,7 @@ class TestPagesIntegration:
         existing_templates = []
         for template_name in common_templates:
             try:
-                template = get_template(template_name)
+                get_template(template_name)  # Just check if it exists
                 existing_templates.append(template_name)
             except TemplateDoesNotExist:
                 # Template doesn't exist, that's OK

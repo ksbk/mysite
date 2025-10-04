@@ -26,7 +26,9 @@ class TestConfigValidationViews:
         """Test config validation with staff user."""
         client = Client()
         staff_user = User.objects.create_user(
-            username="staff", password="staffpass", is_staff=True
+            username="staff",
+            password="staffpass",  # pragma: allowlist secret (test-only)
+            is_staff=True,  # nosec B106 (test-only)
         )
         client.force_login(staff_user)
 
@@ -46,7 +48,9 @@ class TestConfigValidationViews:
         """Test configuration health check view."""
         client = Client()
         staff_user = User.objects.create_user(
-            username="staff", password="staffpass", is_staff=True
+            username="staff",
+            password="staffpass",  # pragma: allowlist secret (test-only)
+            is_staff=True,  # nosec B106 (test-only)
         )
         client.force_login(staff_user)
 
@@ -66,7 +70,9 @@ class TestConfigValidationViews:
         """Test configuration cache clear view."""
         client = Client()
         staff_user = User.objects.create_user(
-            username="staff", password="staffpass", is_staff=True
+            username="staff",
+            password="staffpass",  # pragma: allowlist secret (test-only)
+            is_staff=True,  # nosec B106 (test-only)
         )
         client.force_login(staff_user)
 
@@ -119,7 +125,9 @@ class TestConfigViewsIntegration:
         """Test complete config validation flow."""
         client = Client()
         staff_user = User.objects.create_user(
-            username="staff", password="staffpass", is_staff=True
+            username="staff",
+            password="staffpass",
+            is_staff=True,  # nosec B106 (test-only)
         )
         client.force_login(staff_user)
 

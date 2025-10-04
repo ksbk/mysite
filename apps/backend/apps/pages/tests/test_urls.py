@@ -76,7 +76,7 @@ class TestPagesUrlsIntegration:
             try:
                 url = reverse(url_name)
                 # Try to resolve it back
-                resolved = resolve(url)
+                resolve(url)  # Just check if it resolves
                 resolvable_urls.append(url_name)
             except (NoReverseMatch, Resolver404):
                 # URL not configured, that's OK

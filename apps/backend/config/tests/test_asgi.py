@@ -90,6 +90,8 @@ class TestApplicationConfiguration:
         import os
 
         # After importing, Django should be configured
+        from django.conf import settings
+
         assert "DJANGO_SETTINGS_MODULE" in os.environ or settings.configured
 
     def test_application_error_handling(self):

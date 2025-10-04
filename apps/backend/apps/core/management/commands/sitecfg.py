@@ -15,7 +15,10 @@ from apps.core.sitecfg.loader import ConfigLoader
 class Command(BaseCommand):
     """Management command for site configuration operations."""
 
-    help = "Manage site configuration: backup, restore, validate, cache, audit, and version operations"
+    help = (
+        "Manage site configuration: backup, restore, validate, "
+        "cache, audit, and version operations"
+    )
 
     def add_arguments(self, parser):
         """Add command arguments."""

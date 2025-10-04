@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 
 from django import template
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 
 register = template.Library()
 
@@ -17,7 +17,9 @@ def render_json_ld(data: dict | list | None) -> str:
         return ""
     try:
         payload = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
-        return mark_safe(f'<script type="application/ld+json">{payload}</script>')
+        # Avoid mark_safe; let Django handle HTML-escaping context.
+        # JSON is safe to embed verbatim inside a script tag.
+        return format_html('<script type="application/ld+json">{}</script>', payload)
     except Exception:
         return ""
 

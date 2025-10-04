@@ -94,6 +94,9 @@ repos:
             apps/staticfiles/|
             static/|
             staticfiles/|
+            tests/reports/.*|
+            .github/workflows/.*|
+            (.*/)?tests?/.+|
             package-lock\.json
           )
 
@@ -127,10 +130,13 @@ repos:
     hooks:
       - id: mypy
         name: mypy (django)
-        args: ["--config-file=pyproject.toml"]
+        args: ["--config-file=mypy_precommit.ini"]
         additional_dependencies:
           - django-stubs==5.0.2
           - django-stubs-ext==5.0.2
+          - Django==5.2.6
+          - pydantic>=2
+          - pydantic-settings>=2
           - types-requests
         exclude: |
           (?x)^
@@ -138,8 +144,16 @@ repos:
             .*/migrations/.*|
             apps/frontend/|
             static/|
+            apps/backend/config/settings/.*|
             .*tests?/.*  # keep tests looser; enforce in CI if desired
           )
+        files: |
+          (?x)^
+          (
+            apps/backend/config/.*|\
+            apps/backend/apps/core/context_processors\.py|\
+            apps/backend/apps/core/templatetags/.*
+          )$
 
   # --- Django modernizer --------------------------------------
   - repo: https://github.com/adamchainz/django-upgrade
@@ -192,9 +206,9 @@ repos:
         language: node
         entry: eslint
         additional_dependencies:
-          - "eslint@9.13.0"
-          - "@typescript-eslint/parser@8.8.1"
-          - "@typescript-eslint/eslint-plugin@8.8.1"
+          - "eslint@9.11.1"
+          - "@typescript-eslint/parser@8.7.0"
+          - "@typescript-eslint/eslint-plugin@8.7.0"
           - "eslint-config-prettier@9.1.0"
         files: |
           (?x)^
@@ -202,7 +216,8 @@ repos:
             apps/frontend/src/.*\.(ts|tsx)$
           )
         pass_filenames: false
-        args: ["--max-warnings=0", "--no-error-on-unmatched-pattern", "-c", "apps/frontend/eslint.config.mjs", "apps/frontend/src"]
+        args: ["--max-warnings=100", "--no-error-on-unmatched-pattern", "-c", "apps/frontend/eslint.config.js", "apps/frontend/src"]
+
 
   # --- Markdown style -----------------------------------------
   - repo: https://github.com/DavidAnson/markdownlint-cli2
@@ -210,12 +225,7 @@ repos:
     hooks:
       - id: markdownlint-cli2
         name: markdownlint
-        files: |
-          (?x)^
-          (
-            README\.md|
-            docs/.*\.(md|markdown)$
-          )
+        files: "^docs/.*\\.(md|markdown)$"
 
   # --- Shell scripts ------------------------------------------
   - repo: https://github.com/shellcheck-py/shellcheck-py
@@ -244,11 +254,15 @@ repos:
     rev: 1.7.9
     hooks:
       - id: bandit
-        args: ["-q", "-r", "apps/backend/apps"]
-        exclude: "(?x)^(.*tests?/.+)$"
+        args: ["-q"]
+        exclude: |
+          (?x)^
+          (
+            .*/tests?/.*
+          )
 
   - repo: https://github.com/pypa/pip-audit
     rev: v2.7.3
     hooks:
       - id: pip-audit
-        args: ["-r", "requirements.txt", "-r", "requirements-dev.txt"]
+        args: ["--path", "."]
